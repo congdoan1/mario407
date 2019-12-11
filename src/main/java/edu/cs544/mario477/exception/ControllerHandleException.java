@@ -1,34 +1,70 @@
 package edu.cs544.mario477.exception;
 
-import org.springframework.core.annotation.AnnotationUtils;
+import edu.cs544.mario477.common.Response;
+import edu.cs544.mario477.common.ResponseBuilder;
+import edu.cs544.mario477.common.ResponseCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.naming.NoPermissionException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @ControllerAdvice
-public class ControllerHandleException{
+public class ControllerHandleException {
 
-    public static final String DEFAULT_ERROR_VIEW = "errors/error";
-    public static final String DEFAULT_ACCESS_DENIED = "errors/forbidden";
-
-    @ExceptionHandler(value = Exception.class)
-    public ModelAndView defaultErrorHandler(HttpServletRequest request, Exception ex) throws Exception {
-
-        if (AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class) != null) {
-            throw ex;
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(AppException.class)
+    public Response handleAppException(AppException e) {
+        String errorMsg = "App exception";
+        if (e != null) {
+            errorMsg = e.getMessage();
         }
+        return ResponseBuilder.buildFail(errorMsg);
+    }
 
-        ModelAndView mav = new ModelAndView();
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public Response handleAppException(ResourceNotFoundException e) {
+        String errorMsg = "Not found exception";
+        if (e != null) {
+            errorMsg = e.getMessage();
+        }
+        return ResponseBuilder.buildFail(ResponseCode.NOT_FOUND, "Resource not found", errorMsg);
+    }
 
-        mav.addObject("errorMessage", ex.getMessage());
-        mav.addObject("url", request.getRequestURI());
-        mav.setViewName(DEFAULT_ERROR_VIEW);
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(Exception.class)
+    public Response handleException(Exception e) {
+        String errorMsg = "Exception";
+        if (e != null) {
+            errorMsg = e.getCause() != null ? e.getCause().getLocalizedMessage() : e.getLocalizedMessage();
+        }
+        return ResponseBuilder.buildFail(errorMsg);
+    }
 
-        return mav;
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Response handleValidationExceptions(MethodArgumentNotValidException ex) {
+        List<String> errors = new ArrayList<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            errors.add(error.getDefaultMessage());
+        });
+        return ResponseBuilder.buildFail(ResponseCode.BAD_REQUEST, "Validation Failed", errors);
+    }
+
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(NoPermissionException.class)
+    public Response handleAppException(NoPermissionException e) {
+        String errorMsg = "No permission exception";
+        if (e != null) {
+            errorMsg = e.getMessage();
+        }
+        return ResponseBuilder.buildFail(ResponseCode.UNAUTHORIZED, "No permission", errorMsg);
     }
 }

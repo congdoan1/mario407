@@ -54,7 +54,7 @@ public class User {
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_role",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
@@ -77,4 +77,8 @@ public class User {
             joinColumns = {@JoinColumn(name = "follower_id")},
             inverseJoinColumns = {@JoinColumn(name = "following_id")})
     private List<User> followings = new ArrayList<>();
+
+    public void addRole(Role role) {
+        roles.add(role);
+    }
 }
