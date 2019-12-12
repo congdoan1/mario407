@@ -15,7 +15,10 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Configuration
 @EnableSwagger2
@@ -23,6 +26,10 @@ public class SwaggerConfig {
 
     @Value("${application.version}")
     private String version;
+
+    private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES =
+            new HashSet<String>(Arrays.asList("application/json"));
+
 
     @Bean
     public Docket api() {
@@ -33,6 +40,8 @@ public class SwaggerConfig {
                 .paths(Predicates.not(PathSelectors.regex("/error")))
                 .build()
                 .apiInfo(apiInfo())
+                .produces(DEFAULT_PRODUCES_AND_CONSUMES)
+                .consumes(DEFAULT_PRODUCES_AND_CONSUMES)
                 .securitySchemes(Collections.singletonList(apiKey()))
                 .useDefaultResponseMessages(false);
     }
