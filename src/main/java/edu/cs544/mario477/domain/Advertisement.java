@@ -3,11 +3,17 @@ package edu.cs544.mario477.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import javax.print.attribute.standard.Chromaticity;
+import javax.swing.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,28 +22,32 @@ import java.util.List;
 @Table(name = "advertisement")
 public class Advertisement {
 
-    @OneToMany
-//    @JoinTable(name = "advertisement_user",
-//            joinColumns = {@JoinColumn(name = "advertisement_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    List<User> users;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
     @Column(name = "title", length = 128, nullable = false)
     private String title;
+    
     @Column(name = "description")
     private String description;
-    @LastModifiedDate
+
+    @CreatedDate
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-    public void addUser(User user) {
-        users.add(user);
-    }
+    private int age;
 
-    public void addUsers(List<User> userList) {
-        users.addAll(userList);
-    }
+    private String city;
+
+    private String state;
+
+    private String zipCode;
+
+    private String country;
+
+    private  boolean allUser;
+
+    private boolean enabled;
 
 }

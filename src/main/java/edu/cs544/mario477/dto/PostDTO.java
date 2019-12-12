@@ -1,5 +1,6 @@
 package edu.cs544.mario477.dto;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -22,4 +23,5 @@ public class PostDTO {
     private boolean enabled;
 
     private UserDTO owner;
+
 }

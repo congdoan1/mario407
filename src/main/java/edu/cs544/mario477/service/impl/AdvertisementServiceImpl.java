@@ -1,38 +1,50 @@
 package edu.cs544.mario477.service.impl;
 
+import edu.cs544.mario477.domain.Address;
 import edu.cs544.mario477.domain.Advertisement;
+import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.AdvertisementDTO;
-import edu.cs544.mario477.dto.AdvertisementInputDTO;
+import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.AdvertisementRepository;
+import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.AdvertisementService;
 import edu.cs544.mario477.util.Mapper;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional
 public class AdvertisementServiceImpl implements AdvertisementService {
 
     private AdvertisementRepository advertisementRepository;
 
+    private UserRepository userRepository;
+
     @Autowired
-    public AdvertisementServiceImpl(AdvertisementRepository advertisementRepository) {
+    public AdvertisementServiceImpl(UserRepository userRepository, AdvertisementRepository advertisementRepository) {
+        this.userRepository = userRepository;
         this.advertisementRepository = advertisementRepository;
     }
 
     @Override
-    public AdvertisementDTO add(AdvertisementInputDTO inputDTO) {
+    public AdvertisementDTO add(AdvertisementDTO inputDTO) {
 
-        return convertToDTO(advertisementRepository.saveAndFlush(convertToEntity(inputDTO)));
+        Advertisement advertisement = Mapper.map(inputDTO, Advertisement.class);
+        return Mapper.map(advertisementRepository.saveAndFlush(advertisement), AdvertisementDTO.class);
+
     }
 
     @Override
-    public AdvertisementDTO update(Long id, AdvertisementInputDTO inputDTO) throws NotFoundException {
-        Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(() -> new NotFoundException("not found"));
-        advertisement = convertToEntity(inputDTO);
-        return convertToDTO(advertisementRepository.saveAndFlush(advertisement));
+    public AdvertisementDTO update(Long id, AdvertisementDTO inputDTO) throws ResourceNotFoundException {
+
+        Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Advertisement", "id", id));
+        advertisement = Mapper.map(inputDTO, Advertisement.class);
+
+        return Mapper.map(advertisementRepository.save(advertisement), AdvertisementDTO.class);
     }
 
     @Override
@@ -41,9 +53,29 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public AdvertisementDTO finAdvertisement(Long id) throws NotFoundException {
-        Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(() -> new NotFoundException("not found"));
-        return convertToDTO(advertisement);
+    public AdvertisementDTO finAdvertisement(Long id) throws ResourceNotFoundException {
+
+        Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Advertisement", "id", id));
+        return Mapper.map(advertisement, AdvertisementDTO.class);
+
+    }
+
+    @Override
+    public List<AdvertisementDTO> findAdvertisementMatchWithUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+        LocalDate birthDay = user.getBirthday();
+        int age = LocalDate.now().getYear() - birthDay.getYear();
+        Address address = user.getAddress();
+
+//        List<Advertisement> list = advertisementRepository.findByAgeAfterOrCountryIsLikeOrStateIsLikeOrCityIsLikeOrZipCode
+//                (age,address.getCountry(), address.getState(), address.getCity(), address.getZipcode());
+
+        List<Advertisement> list = advertisementRepository.findByAgeBeforeAndCountryOrStateOrCity
+                (age, address.getCountry(), address.getState(), address.getCity());
+
+
+        return Mapper.mapList(list, AdvertisementDTO.class);
     }
 
     @Override
@@ -53,30 +85,20 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public List<AdvertisementDTO> findAll() {
+
         List<Advertisement> list = advertisementRepository.findAll();
 
         return Mapper.mapList(list, AdvertisementDTO.class);
     }
 
     @Override
-    public void activeAdvertisement(Long id) {
-        Advertisement advertisement = advertisementRepository.findById(id).orElse(null);
+    public void setStatusAdvertisement(Long id, boolean status) {
+        Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Advertisement", "id", id));
 
         if (advertisement != null) {
-//    advertisement.set
+            advertisement.setEnabled(status);
         }
     }
 
-    @Override
-    public void deactiveAvertisement(Long id) {
 
-    }
-
-    public Advertisement convertToEntity(AdvertisementInputDTO inputDTO) {
-        return Mapper.map(inputDTO, Advertisement.class);
-    }
-
-    public AdvertisementDTO convertToDTO(Advertisement advertisement) {
-        return Mapper.map(advertisement, AdvertisementDTO.class);
-    }
 }
