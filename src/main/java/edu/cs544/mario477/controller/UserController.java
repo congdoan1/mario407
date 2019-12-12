@@ -48,4 +48,11 @@ public class UserController {
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
+    @GetMapping("/follower")
+    public Response follower() {
+        long currentId = 1;
+        User user = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentUser", currentId));
+        List<UserDTO> userDTOs = user.getFollowers().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
+        return ResponseBuilder.buildSuccess(userDTOs);
+    }
 }
