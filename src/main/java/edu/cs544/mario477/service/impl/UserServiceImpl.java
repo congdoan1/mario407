@@ -57,4 +57,16 @@ public class UserServiceImpl implements UserService {
         return currentUser;
     }
 
+    @Override
+    public User unfollowUser(long currentId, long id) {
+        User userToFollow = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        User currentUser = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentId", currentId));
+        int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
+        if (checkIndex > -1) {
+            currentUser.getFollowings().remove(checkIndex);
+            userRepository.save(userToFollow);
+        }
+        return currentUser;
+    }
+
 }

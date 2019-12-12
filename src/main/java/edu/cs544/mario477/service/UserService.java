@@ -9,4 +9,6 @@ public interface UserService {
     UserDTO register(RegistrationDTO dto);
 
     User followUser(long currentId, long id);
+
+    User unfollowUser(long currentId, long id);
 }

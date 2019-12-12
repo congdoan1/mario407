@@ -26,4 +26,12 @@ public class UserController {
         List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
+
+    @PostMapping("/unfollow")
+    public Response unfollow(@RequestParam(defaultValue = "0") long id) {
+        long currentId = 1;
+        User user = userService.unfollowUser(currentId, id);
+        List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
+        return ResponseBuilder.buildSuccess(userDTOs);
+    }
 }
