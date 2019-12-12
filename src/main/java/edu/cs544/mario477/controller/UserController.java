@@ -4,6 +4,8 @@ import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.UserDTO;
+import edu.cs544.mario477.exception.ResourceNotFoundException;
+import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.UserService;
 import edu.cs544.mario477.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/follow")
     public Response follow(@RequestParam(defaultValue = "0") long id) {
@@ -34,4 +39,13 @@ public class UserController {
         List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
+
+    @GetMapping("/follow")
+    public Response follow() {
+        long currentId = 1;
+        User user = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentUser", currentId));
+        List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
+        return ResponseBuilder.buildSuccess(userDTOs);
+    }
+
 }
