@@ -4,6 +4,7 @@ import edu.cs544.mario477.domain.Role;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.RegistrationDTO;
 import edu.cs544.mario477.dto.UserDTO;
+import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.RoleRepository;
 import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.UserService;

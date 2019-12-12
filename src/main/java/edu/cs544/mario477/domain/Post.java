@@ -43,6 +43,16 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Media> mediaList = new HashSet<>();
+
+    public Post(String text, User owner) {
+        this.text = text;
+        this.owner = owner;
+    }
+
+    public void addMedia(Media media) {
+        this.mediaList.add(media);
+        media.setPost(this);
+    }
 }

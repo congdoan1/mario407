@@ -8,6 +8,10 @@ import org.springframework.data.domain.Sort;
 
 public class PageUtil {
 
+    public static Pageable initPage(Integer page, Integer size) {
+        return PageRequest.of(page != null ? page : Constants.DEFAULT_PAGE, size != null ? size : Constants.DEFAULT_SIZE);
+    }
+
     public static Pageable initPage(PageDTO pageDTO) {
         return PageRequest.of(getPageDetail(pageDTO)[0], getPageDetail(pageDTO)[1]);
     }
