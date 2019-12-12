@@ -25,7 +25,7 @@ public class Comment {
 
     @CreatedDate
     @Column(name = "commented_date")
-    private LocalDateTime postedDate;
+    private LocalDateTime commentedDate;
 
     @LastModifiedDate
     @Column(name = "last_modified_date")
@@ -38,4 +38,10 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    public Comment(String text, Post post, User owner) {
+        this.text = text;
+        this.post = post;
+        this.owner = owner;
+    }
 }
