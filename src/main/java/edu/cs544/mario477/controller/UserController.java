@@ -26,7 +26,7 @@ public class UserController {
 
     @PostMapping("/follow")
     public Response follow(@RequestParam(defaultValue = "0") long id) {
-        long currentId = 1;
+        long currentId = 2;
         User user = userService.followUser(currentId, id);
         List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
