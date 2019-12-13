@@ -2,6 +2,8 @@ package edu.cs544.mario477.controller;
 
 import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
+import edu.cs544.mario477.domain.Post;
+import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.CommentDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.service.CommentService;
@@ -65,5 +67,21 @@ public class PostController {
         CommentDTO commentDTO = commentService.comment(postId, dto.getText());
 
         return ResponseBuilder.buildSuccess(commentDTO);
+    }
+  
+      @GetMapping("/post")
+    public Response loadPost(@RequestParam(defaultValue = "1") int page) {
+        long currentId = 1;
+        return ResponseBuilder.buildSuccess(postService.getPostByFollow(currentId, page));
+    }
+
+    @GetMapping("/timeline")
+    public Response timeline(@RequestParam(defaultValue = "0") long id, @RequestParam(defaultValue = "1") int page) {
+    //        Fake current user
+        if (id == 0) {
+      //          TODO assign current ID for null id
+            id = 1;
+        }
+        return ResponseBuilder.buildSuccess(postService.getTimelineById(id, page));
     }
 }
