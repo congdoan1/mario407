@@ -10,9 +10,9 @@ import java.util.List;
 
 @Service
 public interface PostService {
-    List<Post> getPostByFollow(long id, int page);
+    List<PostDTO> getPostByFollow(long id, int page);
 
-    List<Post> getTimelineById(long id, int page);
+    List<PostDTO> getTimelineById(long id, int page);
 
     PostDTO createPost(MultipartFile[] files, String text);
 

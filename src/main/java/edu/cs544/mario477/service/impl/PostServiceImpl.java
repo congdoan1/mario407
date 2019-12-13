@@ -3,6 +3,7 @@ package edu.cs544.mario477.service.impl;
 import edu.cs544.mario477.common.Constants;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
+import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.PostRepository;
 import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.PostService;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,22 +47,25 @@ public class PostServiceImpl implements PostService {
     private final StorageService storageService;
 
     @Override
-    public List<Post> getPostByFollow(long id, int page) {
-        Sort sort = Sort.by("postedDate");
+    public List<PostDTO> getPostByFollow(long id, int page) {
+        Sort sort = Sort.by("postedDate").descending();
         Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-        Optional<User> user = userRepository.findById(id);
-        if (!user.isPresent()) {
-            return null;
-        } else {
-            System.out.println(user.get().getFollowings());
-            return null;
-//            return postRepository.findByOwnerIn()
-        }
+        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        return postRepository
+                .findByOwnerIn(currentUser.getFollowings(), pageable)
+                .stream()
+                .map(post -> Mapper.map(post, PostDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Post> getTimelineById(long id, int page) {
-        return null;
+    public List<PostDTO> getTimelineById(long id, int page) {
+        Sort sort = Sort.by("postedDate").descending();
+        Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
+        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        return postRepository.findByOwner(currentUser, pageable).stream()
+                .map(post -> Mapper.map(post, PostDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Autowired

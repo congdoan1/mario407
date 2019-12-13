@@ -2,49 +2,25 @@ package edu.cs544.mario477.controller;
 
 import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
-<<<<<<< HEAD
-import edu.cs544.mario477.domain.Post;
-import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.service.PostService;
+import edu.cs544.mario477.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-
-@RestController
-public class PostController {
-    @Autowired
-    private PostService postService;
-
-    @GetMapping("/post")
-    public Response loadPost(@RequestParam(defaultValue = "1") int page) {
-        long currentId = 1;
-        return ResponseBuilder.buildSuccess(postService.getPostByFollow(currentId, page));
-    }
-
-    @GetMapping("/timeline")
-    public Response timeline(@RequestParam(defaultValue = "0") long id, @RequestParam(defaultValue = "1") int page) {
-//        Fake current user
-        if (id == 0) {
-//          TODO assign current ID for null id
-            id = 1;
-        }
-        return ResponseBuilder.buildSuccess(postService.getTimelineById(id, page));
-=======
 import edu.cs544.mario477.dto.CommentDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.service.CommentService;
-import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.util.PageUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("posts")
@@ -59,6 +35,23 @@ public class PostController {
                           CommentService commentService) {
         this.postService = postService;
         this.commentService = commentService;
+    }
+
+    @GetMapping("/post")
+    public Response loadPost(@RequestParam(defaultValue = "0") int page) {
+        long currentId = 2;
+        List<PostDTO> posts = postService.getPostByFollow(currentId, page);
+        return ResponseBuilder.buildSuccess(posts);
+    }
+
+    @GetMapping("/timeline")
+    public Response timeline(@RequestParam(defaultValue = "0") long id, @RequestParam(defaultValue = "0") int page) {
+//        Fake current user
+        if (id == 0) {
+//          TODO assign current ID for null id
+            id = 1;
+        }
+        return ResponseBuilder.buildSuccess(postService.getTimelineById(id, page));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -96,6 +89,5 @@ public class PostController {
         CommentDTO commentDTO = commentService.comment(postId, dto.getText());
 
         return ResponseBuilder.buildSuccess(commentDTO);
->>>>>>> 7a68013bdc366f86908ccfa9f2544a4845a469d2
     }
 }
