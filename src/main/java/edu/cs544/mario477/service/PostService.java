@@ -21,9 +21,5 @@ public interface PostService {
 
     PostDTO createPost(MultipartFile[] files, String text);
 
-    PostDTO createPost(MultipartFile[] files, String text);
-
     Page<PostDTO> searchPost(String q, Pageable pageable);
-  
-    List<Post> getPostByFollow(long id, int page);
 }

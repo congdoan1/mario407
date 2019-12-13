@@ -88,41 +88,4 @@ public class PostController {
         }
         return ResponseBuilder.buildSuccess(postService.getTimelineById(id, page));
     }
-
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Response<PostDTO> create(@RequestParam("files") MultipartFile[] files,
-                                    @RequestParam("text") String text) {
-
-        PostDTO postDTO = postService.createPost(files, text);
-
-        return ResponseBuilder.buildSuccess(postDTO);
-    }
-
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Response<PostDTO> update(@RequestParam(value = "files", required = false) MultipartFile[] files,
-                                    @RequestParam("text") String text) {
-
-        PostDTO postDTO = postService.createPost(files, text);
-
-        return ResponseBuilder.buildSuccess(postDTO);
-    }
-
-    @GetMapping
-    public Response search(@RequestParam("q") String q,
-                           @RequestParam("page") Integer page,
-                           @RequestParam("size") Integer size) {
-
-        Page<PostDTO> p = postService.searchPost(q, PageUtil.initPage(page, size));
-
-        return ResponseBuilder.buildSuccess(p);
-    }
-
-    @PostMapping("/{id}/comments")
-    public Response comment(@PathVariable("id") Long postId,
-                            @RequestBody @Valid CommentDTO dto) {
-
-        CommentDTO commentDTO = commentService.comment(postId, dto.getText());
-
-        return ResponseBuilder.buildSuccess(commentDTO);
-    }
 }

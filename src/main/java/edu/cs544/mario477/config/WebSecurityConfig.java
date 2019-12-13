@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .authenticationEntryPoint(unauthorizedHandler).and()
 //                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/login", "/register", "/follow", "/posts/post", "/posts/timeline").permitAll()
+                .antMatchers("/login", "/register").permitAll()
                 .anyRequest().authenticated();
 
         // Add our custom JWT security filter

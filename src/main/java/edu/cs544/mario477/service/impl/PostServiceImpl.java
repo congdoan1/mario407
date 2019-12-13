@@ -44,8 +44,6 @@ public class PostServiceImpl implements PostService {
         this.userRepository = userRepository;
     }
 
-    private final StorageService storageService;
-
     @Override
     public List<PostDTO> getPostByFollow(long id, int page) {
         Sort sort = Sort.by("postedDate").descending();
@@ -68,15 +66,6 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList());
     }
 
-    @Autowired
-    public PostServiceImpl(PostRepository postRepository,
-                           StorageService storageService,
-                           UserRepository userRepository) {
-        this.postRepository = postRepository;
-        this.storageService = storageService;
-        this.userRepository = userRepository;
-    }
-
     @Override
     public PostDTO createPost(MultipartFile[] files, String text) {
         Post post = new Post(text, userRepository.getOne(1L));
@@ -94,12 +83,6 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostDTO> searchPost(String q, Pageable pageable) {
-        return null;
-    }
-      
-      @Override
-    public List<Post> getPostByFollow(long id, int page) {
-        Sort sort = Sort.by("postedDate");
         return null;
     }
 }
