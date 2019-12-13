@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -43,4 +44,29 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return Mapper.map(user, UserDTO.class);
     }
+
+    @Override
+    public User followUser(long currentId, long id) {
+        User userToFollow = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        User currentUser = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentId", currentId));
+        int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
+        if (checkIndex < 0) {
+            currentUser.getFollowings().add(userToFollow);
+            userRepository.save(userToFollow);
+        }
+        return currentUser;
+    }
+
+    @Override
+    public User unfollowUser(long currentId, long id) {
+        User userToFollow = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        User currentUser = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentId", currentId));
+        int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
+        if (checkIndex > -1) {
+            currentUser.getFollowings().remove(checkIndex);
+            userRepository.save(userToFollow);
+        }
+        return currentUser;
+    }
+
 }
