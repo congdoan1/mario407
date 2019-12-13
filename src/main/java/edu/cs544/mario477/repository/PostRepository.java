@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface PostRepository extends BaseRepository<Post, Long> {
     List<Post> findByOwnerIn(List<User> user, Pageable pageable);
 
