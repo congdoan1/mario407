@@ -2,13 +2,11 @@ package edu.cs544.mario477.controller;
 
 import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
-import edu.cs544.mario477.domain.Post;
-import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.CommentDTO;
 import edu.cs544.mario477.dto.PostDTO;
+import edu.cs544.mario477.service.IAuthenticationFacade;
 import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.CommentService;
-import edu.cs544.mario477.util.Mapper;
 import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("posts")
@@ -28,11 +25,15 @@ public class PostController {
 
     private final CommentService commentService;
 
+    private final IAuthenticationFacade authenticationFacade;
+
     @Autowired
     public PostController(PostService postService,
-                          CommentService commentService) {
+                          CommentService commentService,
+                          IAuthenticationFacade authenticationFacade) {
         this.postService = postService;
         this.commentService = commentService;
+        this.authenticationFacade = authenticationFacade;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -74,32 +75,27 @@ public class PostController {
   
     @GetMapping("/post")
     public Response loadPost(@RequestParam(defaultValue = "0") int page) {
-        long currentId = 2;
-        List<PostDTO> posts = postService.getPostByFollow(currentId, page);
+        List<PostDTO> posts = postService.getPostByFollow(authenticationFacade.getCurrentUser(), page);
         return ResponseBuilder.buildSuccess(posts);
     }
 
     @GetMapping("/timeline")
     public Response timeline(@RequestParam(defaultValue = "0") long id, @RequestParam(defaultValue = "1") int page) {
-    //        Fake current user
-        if (id == 0) {
-      //          TODO assign current ID for null id
-            id = 1;
-        }
-        return ResponseBuilder.buildSuccess(postService.getTimelineById(id, page));
+        return ResponseBuilder.buildSuccess(postService.getTimelineById(
+               id == 0 ? authenticationFacade.getCurrentUser().getId() : id
+                , page)
+        );
     }
 
     @PostMapping("/like")
     public Response like(@RequestParam(required = true) long postId) {
-        long id = 1;
-        postService.likePost(id, postId);
+        postService.likePost(authenticationFacade.getCurrentUser(), postId);
         return ResponseBuilder.buildSuccess();
     }
 
     @PostMapping("/unlike")
     public Response unlike(@RequestParam(required = true) long postId) {
-        long id = 1;
-        postService.unlikePost(id, postId);
+        postService.unlikePost(authenticationFacade.getCurrentUser(), postId);
         return ResponseBuilder.buildSuccess();
     }
 }

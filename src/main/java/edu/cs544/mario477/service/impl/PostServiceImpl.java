@@ -59,10 +59,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getPostByFollow(long id, int page) {
+    public List<PostDTO> getPostByFollow(User currentUser, int page) {
         Sort sort = Sort.by("postedDate").descending();
         Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         return postRepository
                 .findByOwnerIn(currentUser.getFollowings(), pageable)
                 .stream()
@@ -72,9 +71,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDTO> getTimelineById(long id, int page) {
+        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         Sort sort = Sort.by("postedDate").descending();
         Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         return postRepository.findByOwner(currentUser, pageable).stream()
                 .map(post -> Mapper.map(post, PostDTO.class))
                 .collect(Collectors.toList());
@@ -105,8 +104,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void likePost(long id, long postId) {
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+    public void likePost(User currentUser, long postId) {
         Post currentPost = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
         if (currentPost.getLikers().indexOf(currentUser) < 0) {
             currentPost.getLikers().add(currentUser);
@@ -115,8 +113,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void unlikePost(long id, long postId) {
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+    public void unlikePost(User currentUser, long postId) {
         Post currentPost = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
         if (currentPost.getLikers().indexOf(currentUser) > -1) {
             currentPost.getLikers().remove(currentUser);
