@@ -1,6 +1,5 @@
 package edu.cs544.mario477.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,4 +28,9 @@ public abstract class Media {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+    public Media(String url, String fileFormat, String type) {
+        this.url = url;
+        this.fileFormat = fileFormat;
+    }
 }
