@@ -38,6 +38,8 @@ public class Post {
     @Column(name = "enabled")
     private boolean enabled;
 
+    private boolean isHealthy;
+
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
