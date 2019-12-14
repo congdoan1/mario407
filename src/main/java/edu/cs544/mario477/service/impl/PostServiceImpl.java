@@ -85,4 +85,24 @@ public class PostServiceImpl implements PostService {
     public Page<PostDTO> searchPost(String q, Pageable pageable) {
         return null;
     }
+
+    @Override
+    public void likePost(long id, long postId) {
+        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        Post currentPost = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
+        if (currentPost.getLikers().indexOf(currentUser) < 0) {
+            currentPost.getLikers().add(currentUser);
+            postRepository.save(currentPost);
+        }
+    }
+
+    @Override
+    public void unlikePost(long id, long postId) {
+        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        Post currentPost = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
+        if (currentPost.getLikers().indexOf(currentUser) > -1) {
+            currentPost.getLikers().remove(currentUser);
+            postRepository.save(currentPost);
+        }
+    }
 }

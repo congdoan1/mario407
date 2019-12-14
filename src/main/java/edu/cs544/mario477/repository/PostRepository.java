@@ -4,7 +4,6 @@ import edu.cs544.mario477.base.BaseRepository;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 

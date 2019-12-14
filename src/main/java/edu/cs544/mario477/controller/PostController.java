@@ -88,4 +88,18 @@ public class PostController {
         }
         return ResponseBuilder.buildSuccess(postService.getTimelineById(id, page));
     }
+
+    @PostMapping("/like")
+    public Response like(@RequestParam(required = true) long postId) {
+        long id = 1;
+        postService.likePost(id, postId);
+        return ResponseBuilder.buildSuccess();
+    }
+
+    @PostMapping("/unlike")
+    public Response unlike(@RequestParam(required = true) long postId) {
+        long id = 1;
+        postService.unlikePost(id, postId);
+        return ResponseBuilder.buildSuccess();
+    }
 }
