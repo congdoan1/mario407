@@ -10,6 +10,7 @@ import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.UserService;
 import edu.cs544.mario477.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @PreAuthorize("permitAll()")
     @Override
     public UserDTO register(RegistrationDTO dto) {
         User user = Mapper.map(dto, User.class);

@@ -1,6 +1,7 @@
 package edu.cs544.mario477.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,6 +31,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${accessTokenExpirationInSecond}")
+    private int accessTokenExpirationInSecond;
+
+    @Value("${jwtSigningKey}")
+    private String jwtSigningKey;
+
     @Override
     public void configure(final AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
         oauthServer
@@ -38,15 +45,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     }
 
     @Override
-    public void configure(final ClientDetailsServiceConfigurer clients) throws Exception { // @formatter:off
+    public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
                 .withClient("mario407")
                 .secret(passwordEncoder.encode("mario407"))
                 .authorizedGrantTypes("password", "refresh_token")
                 .scopes("read", "write")
                 .autoApprove(false)
-                .accessTokenValiditySeconds(3600)
-                .refreshTokenValiditySeconds(7 * 24 * 60 * 60);
+                .accessTokenValiditySeconds(accessTokenExpirationInSecond);
     }
 
     @Bean
@@ -76,7 +82,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey("123");
+        converter.setSigningKey(jwtSigningKey);
         return converter;
     }
 
