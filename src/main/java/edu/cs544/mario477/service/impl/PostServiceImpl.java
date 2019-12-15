@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import edu.cs544.mario477.common.Constants;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
+import edu.cs544.mario477.dto.MailDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.IAuthenticationFacade;
 import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.StorageService;
+import edu.cs544.mario477.util.EmailUtil;
 import edu.cs544.mario477.util.Mapper;
 import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,8 @@ public class PostServiceImpl implements PostService {
 
     private final IAuthenticationFacade authenticationFacade;
 
+    private final EmailUtil emailUtil;
+
     @Value("${cloudinary.folder}")
     private String folder;
 
@@ -50,12 +54,14 @@ public class PostServiceImpl implements PostService {
                            StorageService storageService,
                            UserRepository userRepository,
                            Cloudinary cloudinary,
-                           IAuthenticationFacade authenticationFacade) {
+                           IAuthenticationFacade authenticationFacade,
+                           EmailUtil emailUtil) {
         this.postRepository = postRepository;
         this.storageService = storageService;
         this.userRepository = userRepository;
         this.cloudinary = cloudinary;
         this.authenticationFacade = authenticationFacade;
+        this.emailUtil = emailUtil;
     }
 
     @Override
@@ -92,6 +98,18 @@ public class PostServiceImpl implements PostService {
                 post.addMedia(storageService.upload(files[i], post.getId(), i));
             }
             postRepository.save(post);
+
+            //Check malicious user's unhealthy post;
+            if (postRepository.countUnHealthyPost(post.getOwner().getId()) >= 20) {
+                userRepository.updateUserStatus(post.getOwner().getId(), false);
+                MailDTO  mailDTO = new MailDTO();
+                mailDTO.setFrom("");
+                mailDTO.setSubject("Lock account");
+                mailDTO.setText("Your account was locked by unhealthy posts. Contact admin for more information");
+                emailUtil.sendMail(mailDTO);
+
+            }
+
             return Mapper.map(post, PostDTO.class);
         } catch (IOException e) {
             throw new AppException(e.getLocalizedMessage());

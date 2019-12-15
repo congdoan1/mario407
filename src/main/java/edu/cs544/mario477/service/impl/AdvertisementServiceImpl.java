@@ -1,5 +1,6 @@
 package edu.cs544.mario477.service.impl;
 
+import edu.cs544.mario477.common.Constants;
 import edu.cs544.mario477.domain.Address;
 import edu.cs544.mario477.domain.Advertisement;
 import edu.cs544.mario477.domain.User;
@@ -9,7 +10,10 @@ import edu.cs544.mario477.repository.AdvertisementRepository;
 import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.AdvertisementService;
 import edu.cs544.mario477.util.Mapper;
+import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -68,6 +72,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         int age = LocalDate.now().getYear() - birthDay.getYear();
         Address address = user.getAddress();
 
+
 //        List<Advertisement> list = advertisementRepository.findByAgeAfterOrCountryIsLikeOrStateIsLikeOrCityIsLikeOrZipCode
 //                (age,address.getCountry(), address.getState(), address.getCity(), address.getZipcode());
 
@@ -84,10 +89,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public List<AdvertisementDTO> findAll() {
+    public List<AdvertisementDTO> findAll(int page) {
 
-        List<Advertisement> list = advertisementRepository.findAll();
+        Sort sort = Sort.by("title").ascending();
+        Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
 
+        List<Advertisement> list = advertisementRepository.findAllAd(pageable);
         return Mapper.mapList(list, AdvertisementDTO.class);
     }
 

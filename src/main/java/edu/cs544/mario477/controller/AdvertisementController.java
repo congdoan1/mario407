@@ -14,8 +14,14 @@ import java.util.List;
 @RequestMapping("/advertisements")
 public class AdvertisementController {
 
+
+    private AdvertisementService advertisementService;
+
     @Autowired
-    AdvertisementService advertisementService;
+    public AdvertisementController(AdvertisementService advertisementService) {
+        this.advertisementService = advertisementService;
+    }
+
 
     @PostMapping
     public Response<AdvertisementDTO> add(@RequestBody @Valid AdvertisementDTO inputDTO) {
@@ -41,11 +47,11 @@ public class AdvertisementController {
     }
 
     @GetMapping
-    public Response<List<AdvertisementDTO>> list() {
-        return ResponseBuilder.buildSuccess(advertisementService.findAll());
+    public Response<List<AdvertisementDTO>> list(@RequestParam(defaultValue = "0") Integer page) {
+        return ResponseBuilder.buildSuccess(advertisementService.findAll(page));
     }
 
-    @GetMapping(value = "/match-users/{userId}")
+    @GetMapping(value = "/match-user/{userId}")
     public Response<List<AdvertisementDTO>> listMatchUser(@PathVariable Long userId) {
 
         return ResponseBuilder.buildSuccess(advertisementService.findAdvertisementMatchWithUser(userId));

@@ -7,11 +7,17 @@ import java.util.List;
 
 public interface AdminService {
 
-    List<PostDTO> filterPostByKeyword();
+    List<PostDTO> findUnhealthyPost(int page);
 
-    boolean setPostStatus(Long postId, boolean status);
+    List<PostDTO> findUnhealthyPost();
 
-    boolean setUserStatus(Long userId, boolean status);
+    List<PostDTO> findUnhealthyPostByUser(int UserId);
+
+    List<UserDTO> findMaliciousUser(int page);
+
+    void setPostStatus(Long postId, boolean status);
+
+    void setUserStatus(Long userId, boolean status);
 
 
 }

@@ -2,7 +2,6 @@ package edu.cs544.mario477.controller;
 
 import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
-import edu.cs544.mario477.domain.Keyword;
 import edu.cs544.mario477.dto.KeywordDTO;
 import edu.cs544.mario477.service.KeywordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,12 @@ import java.util.List;
 @RequestMapping("/keywords")
 public class KeywordController {
 
+    private KeywordService keywordService;
+
     @Autowired
-    KeywordService keywordService;
+    public KeywordController(KeywordService keywordService) {
+        this.keywordService = keywordService;
+    }
 
     @PostMapping
     public Response<KeywordDTO> add(@RequestBody KeywordDTO inputDTO) {
@@ -41,9 +44,9 @@ public class KeywordController {
     }
 
     @GetMapping
-    public Response<List<KeywordDTO>> list() {
+    public Response<List<KeywordDTO>> list(@RequestParam(defaultValue = "0") Integer page) {
 
-        return ResponseBuilder.buildSuccess(keywordService.findAll());
+        return ResponseBuilder.buildSuccess(keywordService.findAll(page));
     }
 
 }

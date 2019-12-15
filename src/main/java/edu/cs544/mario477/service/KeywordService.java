@@ -17,6 +17,6 @@ public interface KeywordService {
 
     KeywordDTO finKeyword(Long id);
 
-    List<KeywordDTO> findAll();
+    List<KeywordDTO> findAll(int page);
 
 }

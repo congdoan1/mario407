@@ -17,7 +17,7 @@ public interface AdvertisementService {
 
     AdvertisementDTO findAdvertisementByName(String name);
 
-    List<AdvertisementDTO> findAll();
+    List<AdvertisementDTO> findAll(int page);
 
     void setStatusAdvertisement(Long id, boolean status);
 
