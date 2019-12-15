@@ -6,6 +6,9 @@ import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.UserDTO;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.UserRepository;
+import edu.cs544.mario477.service.CommentService;
+import edu.cs544.mario477.service.IAuthenticationFacade;
+import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.UserService;
 import edu.cs544.mario477.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,41 +21,44 @@ import java.util.stream.Collectors;
 @RestController
 public class UserController {
 
-    @Autowired
     private UserService userService;
 
-    @Autowired
     private UserRepository userRepository;
+
+    private final IAuthenticationFacade authenticationFacade;
+
+    @Autowired
+    public UserController(UserService userService,
+                          UserRepository userRepository,
+                          IAuthenticationFacade authenticationFacade) {
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @PostMapping("/follow")
     public Response follow(@RequestParam(defaultValue = "0") long id) {
-        long currentId = 2;
-        User user = userService.followUser(currentId, id);
+        User user = userService.followUser(id);
         List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
     @PostMapping("/unfollow")
     public Response unfollow(@RequestParam(defaultValue = "0") long id) {
-        long currentId = 1;
-        User user = userService.unfollowUser(currentId, id);
+        User user = userService.unfollowUser(id);
         List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
     @GetMapping("/follow")
     public Response follow() {
-        long currentId = 1;
-        User user = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentUser", currentId));
-        List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
+        List<UserDTO> userDTOs = authenticationFacade.getCurrentUser().getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
     @GetMapping("/follower")
     public Response follower() {
-        long currentId = 1;
-        User user = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentUser", currentId));
-        List<UserDTO> userDTOs = user.getFollowers().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
+        List<UserDTO> userDTOs = authenticationFacade.getCurrentUser().getFollowers().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 }
