@@ -44,6 +44,9 @@ public class User {
     @Column(name = "birthday")
     private LocalDate birthday;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Column(name = "signup_date")
     private LocalDateTime signupDate;
 

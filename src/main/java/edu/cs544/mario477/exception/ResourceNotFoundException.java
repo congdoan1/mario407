@@ -22,6 +22,13 @@ public class ResourceNotFoundException extends RuntimeException {
         this.fieldValue = fieldValue;
     }
 
+    public ResourceNotFoundException(Class clazz, String fieldName, Object fieldValue) {
+        super(String.format("%s not found with %s : %s", clazz.getSimpleName(), fieldName, fieldValue));
+        this.resourceName = clazz.getSimpleName();
+        this.fieldName = fieldName;
+        this.fieldValue = fieldValue;
+    }
+
     public ResourceNotFoundException(Class clazz, String... searchParamsMap) {
         super(ResourceNotFoundException.generateMessage(clazz.getSimpleName(),
                 toMap(String.class, String.class, searchParamsMap)));

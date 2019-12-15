@@ -24,6 +24,8 @@ public class UserDTO {
 
     private LocalDate birthday;
 
+    private String avatarUrl;
+
     private boolean enabled;
 
     private AddressDTO address;

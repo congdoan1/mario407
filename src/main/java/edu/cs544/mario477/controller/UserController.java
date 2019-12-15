@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -54,5 +55,11 @@ public class UserController {
         User user = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentUser", currentId));
         List<UserDTO> userDTOs = user.getFollowers().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
+    }
+
+    @GetMapping("/{username}")
+    public Response getUser(@PathVariable("username") String username) {
+        UserDTO userDTO = userService.getUser(username);
+        return ResponseBuilder.buildSuccess(userDTO);
     }
 }

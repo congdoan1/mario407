@@ -38,6 +38,7 @@ public class Post {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @Column(name = "is_healthy")
     private boolean isHealthy;
 
     @ManyToOne

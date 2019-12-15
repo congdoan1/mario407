@@ -11,4 +11,6 @@ public interface UserService {
     User followUser(long currentId, long id);
 
     User unfollowUser(long currentId, long id);
+
+    UserDTO getUser(String username);
 }
