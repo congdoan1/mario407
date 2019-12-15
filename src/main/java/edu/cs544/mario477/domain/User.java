@@ -23,7 +23,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "username", length = 20, nullable = false)
+    @Column(name = "username", length = 20, nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
@@ -35,10 +35,10 @@ public class User {
     @Column(name = "last_name", length = 64)
     private String lastName;
 
-    @Column(name = "email", length = 50)
+    @Column(name = "email", length = 50, unique = true)
     private String email;
 
-    @Column(name = "phone", length = 10)
+    @Column(name = "phone", length = 10, unique = true)
     private String phone;
 
     @Column(name = "birthday")
@@ -54,7 +54,7 @@ public class User {
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
@@ -77,4 +77,8 @@ public class User {
             joinColumns = {@JoinColumn(name = "follower_id")},
             inverseJoinColumns = {@JoinColumn(name = "following_id")})
     private List<User> followings = new ArrayList<>();
+
+    public void addRole(Role role) {
+        roles.add(role);
+    }
 }

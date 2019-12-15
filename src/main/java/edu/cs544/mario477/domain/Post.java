@@ -8,7 +8,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -36,6 +38,8 @@ public class Post {
     @Column(name = "enabled")
     private boolean enabled;
 
+    private boolean isHealthy;
+
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -43,6 +47,19 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Media> mediaList = new HashSet<>();
+
+    @ManyToMany
+    private List<User> likers = new ArrayList<>();
+
+    public Post(String text, User owner) {
+        this.text = text;
+        this.owner = owner;
+    }
+
+    public void addMedia(Media media) {
+        this.mediaList.add(media);
+        media.setPost(this);
+    }
 }

@@ -28,4 +28,9 @@ public abstract class Media {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+    public Media(String url, String fileFormat, String type) {
+        this.url = url;
+        this.fileFormat = fileFormat;
+    }
 }

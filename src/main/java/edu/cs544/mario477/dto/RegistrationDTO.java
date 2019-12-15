@@ -2,6 +2,7 @@ package edu.cs544.mario477.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -26,11 +27,12 @@ public class RegistrationDTO {
     private String lastName;
 
     @Email(message = "Wrong email format")
-    @NotBlank(message = "Email is required")
+    @NotBlank
     private String email;
 
     private String phone;
 
     @Past
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthday;
 }

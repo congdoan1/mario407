@@ -1,6 +1,7 @@
 package edu.cs544.mario477.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.http.HttpStatus;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response<T> {
@@ -10,8 +11,8 @@ public class Response<T> {
     private Object errors;
     private T data;
 
-    public Response<T> setCode(ResponseCode resultCode) {
-        this.code = resultCode.getCode();
+    public Response<T> setCode(HttpStatus httpStatus) {
+        this.code = httpStatus.value();
         return this;
     }
 
