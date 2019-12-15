@@ -22,4 +22,8 @@ public interface PostService {
     PostDTO createPost(MultipartFile[] files, String text);
 
     Page<PostDTO> searchPost(String q, Pageable pageable);
+
+    void likePost(long id, long postId);
+
+    void unlikePost(long id, long postId);
 }

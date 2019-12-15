@@ -6,6 +6,7 @@ import edu.cs544.mario477.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
+
 import java.util.List;
 
 public interface PostRepository extends BaseRepository<Post, Long> {
