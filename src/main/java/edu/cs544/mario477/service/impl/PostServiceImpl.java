@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,24 +60,26 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getPostByFollow(User currentUser, int page) {
-        Sort sort = Sort.by("postedDate").descending();
-        Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-        return postRepository
-                .findByOwnerIn(currentUser.getFollowings(), pageable)
-                .stream()
-                .map(post -> Mapper.map(post, PostDTO.class))
-                .collect(Collectors.toList());
+    public List<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
+        List<User> users = new ArrayList<>(currentUser.getFollowings());
+        users.add(currentUser);
+        List<Post> posts = postRepository.findByOwnerIn(users, pageable);
+        return Mapper.mapList(posts, PostDTO.class);
     }
 
     @Override
-    public List<PostDTO> getTimelineById(long id, int page) {
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-        Sort sort = Sort.by("postedDate").descending();
-        Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-        return postRepository.findByOwner(currentUser, pageable).stream()
-                .map(post -> Mapper.map(post, PostDTO.class))
-                .collect(Collectors.toList());
+    public List<PostDTO> getTimelineById(long id, Pageable pageable) {
+        User queryUser;
+        if (authenticationFacade.getCurrentUser().getId() != id) {
+            queryUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+            if (authenticationFacade.getCurrentUser().getFollowings().indexOf(queryUser) < 0) {
+                return null;
+            }
+        } else {
+            queryUser = authenticationFacade.getCurrentUser();
+        }
+        List<Post> posts = postRepository.findByOwner(queryUser, pageable);
+        return Mapper.mapList(posts, PostDTO.class);
     }
 
     @Override
