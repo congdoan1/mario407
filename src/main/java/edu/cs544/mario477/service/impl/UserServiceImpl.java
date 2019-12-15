@@ -1,5 +1,6 @@
 package edu.cs544.mario477.service.impl;
 
+import com.cloudinary.Cloudinary;
 import edu.cs544.mario477.domain.Role;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.RegistrationDTO;
@@ -7,30 +8,39 @@ import edu.cs544.mario477.dto.UserDTO;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.RoleRepository;
 import edu.cs544.mario477.repository.UserRepository;
+import edu.cs544.mario477.service.IAuthenticationFacade;
 import edu.cs544.mario477.service.UserService;
 import edu.cs544.mario477.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private final IAuthenticationFacade authenticationFacade;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder,
+                           IAuthenticationFacade authenticationFacade) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @PreAuthorize("permitAll()")
     @Override
@@ -48,9 +58,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User followUser(long currentId, long id) {
+    public User followUser(long id) {
+        User currentUser = authenticationFacade.getCurrentUser();
         User userToFollow = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-        User currentUser = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentId", currentId));
         int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
         if (checkIndex < 0) {
             currentUser.getFollowings().add(userToFollow);
@@ -60,9 +70,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User unfollowUser(long currentId, long id) {
+    public User unfollowUser(long id) {
+        User currentUser = authenticationFacade.getCurrentUser();
         User userToFollow = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-        User currentUser = userRepository.findById(currentId).orElseThrow(() -> new ResourceNotFoundException("User", "currentId", currentId));
         int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
         if (checkIndex > -1) {
             currentUser.getFollowings().remove(checkIndex);
