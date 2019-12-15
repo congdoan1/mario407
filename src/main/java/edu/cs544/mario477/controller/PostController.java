@@ -10,6 +10,7 @@ import edu.cs544.mario477.service.CommentService;
 import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,17 +74,22 @@ public class PostController {
         return ResponseBuilder.buildSuccess(commentDTO);
     }
   
-    @GetMapping("/post")
-    public Response loadPost(@RequestParam(defaultValue = "0") int page) {
-        List<PostDTO> posts = postService.getPostByFollow(authenticationFacade.getCurrentUser(), page);
+    @GetMapping("/home")
+    public Response loadPost(@RequestParam("page") Integer page,
+                             @RequestParam("size") Integer size) {
+        Sort sort = Sort.by("postedDate").descending();
+        List<PostDTO> posts = postService.getHomePosts(authenticationFacade.getCurrentUser(), PageUtil.initPage(page, size, sort));
         return ResponseBuilder.buildSuccess(posts);
     }
 
     @GetMapping("/timeline")
-    public Response timeline(@RequestParam(defaultValue = "0") long id, @RequestParam(defaultValue = "1") int page) {
+    public Response timeline(@RequestParam(defaultValue = "0") long id,
+                             @RequestParam("page") Integer page,
+                             @RequestParam("size") Integer size) {
+        Sort sort = Sort.by("postedDate").descending();
         return ResponseBuilder.buildSuccess(postService.getTimelineById(
-               id == 0 ? authenticationFacade.getCurrentUser().getId() : id
-                , page)
+               id == 0 ? authenticationFacade.getCurrentUser().getId() : id,
+                PageUtil.initPage(page, size, sort))
         );
     }
 
