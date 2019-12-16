@@ -60,15 +60,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
+    public Page<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
         List<User> users = new ArrayList<>(currentUser.getFollowings());
         users.add(currentUser);
-        List<Post> posts = postRepository.findByOwnerIn(users, pageable);
-        return Mapper.mapList(posts, PostDTO.class);
+        Page<Post> posts = postRepository.findByOwnerIn(users, pageable);
+        return Mapper.mapPage(posts, PostDTO.class);
     }
 
     @Override
-    public List<PostDTO> getTimelineById(long id, Pageable pageable) {
+    public Page<PostDTO> getTimelineById(long id, Pageable pageable) {
         User queryUser;
         if (authenticationFacade.getCurrentUser().getId() != id) {
             queryUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
@@ -78,8 +78,8 @@ public class PostServiceImpl implements PostService {
         } else {
             queryUser = authenticationFacade.getCurrentUser();
         }
-        List<Post> posts = postRepository.findByOwner(queryUser, pageable);
-        return Mapper.mapList(posts, PostDTO.class);
+        Page<Post> posts = postRepository.findByOwner(queryUser, pageable);
+        return Mapper.mapPage(posts, PostDTO.class);
     }
 
     @Override
