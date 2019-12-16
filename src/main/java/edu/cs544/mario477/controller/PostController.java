@@ -82,17 +82,6 @@ public class PostController {
         return ResponseBuilder.buildSuccess(posts);
     }
 
-    @GetMapping("/timeline")
-    public Response timeline(@RequestParam(defaultValue = "0") long id,
-                             @RequestParam(value = "page", required = false) Integer page,
-                             @RequestParam(value = "size", required = false) Integer size) {
-        Sort sort = Sort.by("postedDate").descending();
-        return ResponseBuilder.buildSuccess(postService.getTimelineById(
-               id == 0 ? authenticationFacade.getCurrentUser().getId() : id,
-                PageUtil.initPage(page, size, sort))
-        );
-    }
-
     @PostMapping("/like")
     public Response like(@RequestParam(required = true) long postId) {
         postService.likePost(authenticationFacade.getCurrentUser(), postId);

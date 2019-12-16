@@ -68,11 +68,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostDTO> getTimelineById(long id, Pageable pageable) {
+    public Page<PostDTO> getTimelineByUsername(String username, Pageable pageable) {
         User queryUser;
-        if (authenticationFacade.getCurrentUser().getId() != id) {
-            queryUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        if (!authenticationFacade.getCurrentUser().getUsername().equals(username)) {
+            queryUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
             if (authenticationFacade.getCurrentUser().getFollowings().indexOf(queryUser) < 0) {
+                System.out.println("do");
                 return null;
             }
         } else {

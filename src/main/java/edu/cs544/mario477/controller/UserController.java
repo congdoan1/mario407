@@ -11,7 +11,9 @@ import edu.cs544.mario477.service.IAuthenticationFacade;
 import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.UserService;
 import edu.cs544.mario477.util.Mapper;
+import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,6 +26,8 @@ public class UserController {
 
     private UserService userService;
 
+    private PostService postService;
+
     private UserRepository userRepository;
 
     private final IAuthenticationFacade authenticationFacade;
@@ -31,8 +35,10 @@ public class UserController {
     @Autowired
     public UserController(UserService userService,
                           UserRepository userRepository,
+                          PostService postService,
                           IAuthenticationFacade authenticationFacade) {
         this.userService = userService;
+        this.postService = postService;
         this.userRepository = userRepository;
         this.authenticationFacade = authenticationFacade;
     }
@@ -67,5 +73,13 @@ public class UserController {
     public Response getUser(@PathVariable("username") String username) {
         UserDTO userDTO = userService.getUser(username);
         return ResponseBuilder.buildSuccess(userDTO);
+    }
+
+    @GetMapping("/{username}/timeline")
+    public Response timeline(@PathVariable("username") String username,
+                             @RequestParam(value = "page", required = false) Integer page,
+                             @RequestParam(value = "size", required = false) Integer size) {
+        Sort sort = Sort.by("postedDate").descending();
+        return ResponseBuilder.buildSuccess(postService.getTimelineByUsername(username, PageUtil.initPage(page, size, sort)));
     }
 }

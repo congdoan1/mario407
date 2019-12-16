@@ -13,5 +13,5 @@ import java.util.List;
 public interface PostRepository extends BaseRepository<Post, Long> {
     Page<Post> findByOwnerIn(List<User> user, Pageable pageable);
 
-    Page<Post> findByOwner(User currentUser, Pageable pageable);
+    Page<Post> findByOwner(User user, Pageable pageable);
 }
