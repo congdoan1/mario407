@@ -27,4 +27,8 @@ public class PostDTO {
     private Set<MediaDTO> mediaList;
 
     private UserDTO owner;
+
+    private int numberOfLikes;
+
+    private int numberOfComments;
 }

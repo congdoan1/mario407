@@ -63,4 +63,12 @@ public class Post {
         this.mediaList.add(media);
         media.setPost(this);
     }
+
+    public int getNumberOfLikes() {
+        return likers.size();
+    }
+
+    public int getNumberOfComments() {
+        return comments.size();
+    }
 }

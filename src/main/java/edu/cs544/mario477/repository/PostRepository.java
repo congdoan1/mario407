@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface PostRepository extends BaseRepository<Post, Long> {
-    List<Post> findByOwnerIn(List<User> user, Pageable pageable);
+    Page<Post> findByOwnerIn(List<User> user, Pageable pageable);
 
-    List<Post> findByOwner(User currentUser, Pageable pageable);
+    Page<Post> findByOwner(User user, Pageable pageable);
 }

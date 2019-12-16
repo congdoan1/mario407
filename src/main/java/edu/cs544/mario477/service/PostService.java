@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface PostService {
 
-    List<PostDTO> getHomePosts(User currentUser, Pageable pageable);
+    Page<PostDTO> getHomePosts(User currentUser, Pageable pageable);
 
-    List<PostDTO> getTimelineById(long id, Pageable pageable);
+    Page<PostDTO> getTimelineByUsername(String username, Pageable pageable);
 
     PostDTO createPost(MultipartFile[] files, String text);
 

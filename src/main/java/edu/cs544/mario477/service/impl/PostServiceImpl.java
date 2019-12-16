@@ -60,26 +60,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
+    public Page<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
         List<User> users = new ArrayList<>(currentUser.getFollowings());
         users.add(currentUser);
-        List<Post> posts = postRepository.findByOwnerIn(users, pageable);
-        return Mapper.mapList(posts, PostDTO.class);
+        Page<Post> posts = postRepository.findByOwnerIn(users, pageable);
+        return Mapper.mapPage(posts, PostDTO.class);
     }
 
     @Override
-    public List<PostDTO> getTimelineById(long id, Pageable pageable) {
+    public Page<PostDTO> getTimelineByUsername(String username, Pageable pageable) {
         User queryUser;
-        if (authenticationFacade.getCurrentUser().getId() != id) {
-            queryUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        if (!authenticationFacade.getCurrentUser().getUsername().equals(username)) {
+            queryUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
             if (authenticationFacade.getCurrentUser().getFollowings().indexOf(queryUser) < 0) {
+                System.out.println("do");
                 return null;
             }
         } else {
             queryUser = authenticationFacade.getCurrentUser();
         }
-        List<Post> posts = postRepository.findByOwner(queryUser, pageable);
-        return Mapper.mapList(posts, PostDTO.class);
+        Page<Post> posts = postRepository.findByOwner(queryUser, pageable);
+        return Mapper.mapPage(posts, PostDTO.class);
     }
 
     @Override
