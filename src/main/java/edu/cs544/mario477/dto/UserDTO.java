@@ -2,7 +2,9 @@ package edu.cs544.mario477.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @Data
@@ -12,16 +14,18 @@ public class UserDTO {
 
     private String username;
 
-    @JsonProperty("first_name")
+    @NotBlank
     private String firstName;
 
-    @JsonProperty("last_name")
+    @NotBlank
     private String lastName;
 
+    @NotBlank
     private String email;
 
     private String phone;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthday;
 
     private String avatarUrl;

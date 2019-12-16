@@ -3,15 +3,12 @@ package edu.cs544.mario477.exception;
 import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,9 +29,6 @@ import java.util.List;
 @Component
 @ControllerAdvice
 public class ControllerHandleException extends ResponseEntityExceptionHandler {
-
-    @Autowired
-    private MessageSource messageSource;
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
@@ -73,7 +67,8 @@ public class ControllerHandleException extends ResponseEntityExceptionHandler {
             errors.add(error.getDefaultMessage());
         });
         return ResponseEntity.badRequest().body(
-                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errors));
+                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errors)
+        );
     }
 
     @Override
@@ -85,7 +80,8 @@ public class ControllerHandleException extends ResponseEntityExceptionHandler {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
         String error = "Malformed JSON request";
         return ResponseEntity.badRequest().body(
-                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, error, ex.getLocalizedMessage()));
+                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, error, ex.getLocalizedMessage())
+        );
     }
 
     @Override

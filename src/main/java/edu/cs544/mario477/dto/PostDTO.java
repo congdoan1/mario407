@@ -15,10 +15,8 @@ public class PostDTO {
 
     private String text;
 
-    @JsonProperty("posted_date")
     private LocalDateTime postedDate;
 
-    @JsonProperty("last_modified_date")
     private LocalDateTime lastModifiedDate;
 
     private boolean enabled;

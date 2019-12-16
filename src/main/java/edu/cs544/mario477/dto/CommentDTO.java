@@ -12,10 +12,8 @@ public class CommentDTO {
 
     private String text;
 
-    @JsonProperty("commented_date")
     private LocalDateTime postedDate;
 
-    @JsonProperty("last_modified_date")
     private LocalDateTime lastModifiedDate;
 
     private UserDTO owner;

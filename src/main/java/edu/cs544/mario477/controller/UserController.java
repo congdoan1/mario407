@@ -4,9 +4,6 @@ import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.UserDTO;
-import edu.cs544.mario477.exception.ResourceNotFoundException;
-import edu.cs544.mario477.repository.UserRepository;
-import edu.cs544.mario477.service.CommentService;
 import edu.cs544.mario477.service.IAuthenticationFacade;
 import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.UserService;
@@ -14,7 +11,9 @@ import edu.cs544.mario477.util.Mapper;
 import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,18 +27,14 @@ public class UserController {
 
     private PostService postService;
 
-    private UserRepository userRepository;
-
     private final IAuthenticationFacade authenticationFacade;
 
     @Autowired
     public UserController(UserService userService,
-                          UserRepository userRepository,
                           PostService postService,
                           IAuthenticationFacade authenticationFacade) {
         this.userService = userService;
         this.postService = postService;
-        this.userRepository = userRepository;
         this.authenticationFacade = authenticationFacade;
     }
 
@@ -70,10 +65,11 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public Response getUser(@PathVariable("username") String username) {
+    public Response<UserDTO> getUser(@PathVariable("username") String username) {
         UserDTO userDTO = userService.getUser(username);
         return ResponseBuilder.buildSuccess(userDTO);
     }
+
 
     @GetMapping("/{username}/timeline")
     public Response timeline(@PathVariable("username") String username,
@@ -81,5 +77,17 @@ public class UserController {
                              @RequestParam(value = "size", required = false) Integer size) {
         Sort sort = Sort.by("postedDate").descending();
         return ResponseBuilder.buildSuccess(postService.getTimelineByUsername(username, PageUtil.initPage(page, size, sort)));
+    }
+
+    @PutMapping
+    public Response<Void> updateUser(@RequestBody @Valid UserDTO userDTO) {
+        userService.updateUser(userDTO);
+        return ResponseBuilder.buildSuccess();
+    }
+
+    @PutMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response<Void> updateAvatar(@RequestParam(value = "avatar", required = false) MultipartFile avatarFile) {
+        userService.updateAvatar(avatarFile);
+        return ResponseBuilder.buildSuccess();
     }
 }

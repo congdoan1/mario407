@@ -51,4 +51,22 @@ public class StorageServiceImpl implements StorageService {
         }
         return media;
     }
+
+    @Override
+    public String upload(MultipartFile file, Long userId) {
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "public_id", "avatar_" + userId,
+                            "folder", folder + "avatar"
+                    ));
+            if (uploadResult == null) {
+                throw new AppException("Error in uploading media file(s)");
+            }
+            return uploadResult.get("url").toString();
+        } catch (IOException e) {
+            throw new AppException(e.getLocalizedMessage());
+        }
+    }
 }

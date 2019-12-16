@@ -10,4 +10,6 @@ public interface StorageService {
     void upload(MultipartFile[] files, Long postId);
 
     Media upload(MultipartFile file, Long postId, int number) throws IOException;
+
+    String upload(MultipartFile file, Long userId);
 }

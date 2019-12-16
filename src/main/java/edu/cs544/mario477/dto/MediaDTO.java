@@ -10,6 +10,5 @@ public class MediaDTO {
 
     private String url;
 
-    @JsonProperty("file_format")
     private String fileFormat;
 }
