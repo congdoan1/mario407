@@ -82,14 +82,14 @@ public class PostController {
         return ResponseBuilder.buildSuccess(posts);
     }
 
-    @PostMapping("/like")
-    public Response like(@RequestParam(required = true) long postId) {
+    @PostMapping("/{postId}/like")
+    public Response like(@PathVariable long postId) {
         postService.likePost(authenticationFacade.getCurrentUser(), postId);
         return ResponseBuilder.buildSuccess();
     }
 
-    @PostMapping("/unlike")
-    public Response unlike(@RequestParam(required = true) long postId) {
+    @PostMapping("/{postId}/unlike")
+    public Response unlike(@PathVariable long postId) {
         postService.unlikePost(authenticationFacade.getCurrentUser(), postId);
         return ResponseBuilder.buildSuccess();
     }
