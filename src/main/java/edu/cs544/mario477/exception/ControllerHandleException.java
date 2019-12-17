@@ -3,6 +3,8 @@ package edu.cs544.mario477.exception;
 import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -23,12 +27,18 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.naming.NoPermissionException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @ControllerAdvice
 public class ControllerHandleException extends ResponseEntityExceptionHandler {
+
+    @Autowired
+    MessageSource messageSource;
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
@@ -62,12 +72,13 @@ public class ControllerHandleException extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
-        List<String> errors = new ArrayList<>();
-        ex.getBindingResult().getFieldErrors().forEach((error) -> {
-            errors.add(error.getDefaultMessage());
-        });
+        BindingResult result = ex.getBindingResult();
+        List<String> errorMessages = result.getAllErrors()
+                .stream()
+                .map(objectError -> messageSource.getMessage(objectError, Locale.getDefault()))
+                .collect(Collectors.toList());
         return ResponseEntity.badRequest().body(
-                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errors)
+                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errorMessages)
         );
     }
 
