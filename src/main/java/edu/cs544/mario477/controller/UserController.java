@@ -10,6 +10,7 @@ import edu.cs544.mario477.service.UserService;
 import edu.cs544.mario477.util.Mapper;
 import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -52,15 +53,19 @@ public class UserController {
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
-    @GetMapping("/follow")
-    public Response follow() {
-        List<UserDTO> userDTOs = authenticationFacade.getCurrentUser().getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
+    @GetMapping("/{username}/following")
+    public Response follow(@PathVariable("username") String username,
+                           @RequestParam(value = "page", required = false) Integer page,
+                           @RequestParam(value = "size", required = false) Integer size) {
+        Page<UserDTO> userDTOs = userService.getListFollowingByUser(username, PageUtil.initPage(page, size));
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
-    @GetMapping("/follower")
-    public Response follower() {
-        List<UserDTO> userDTOs = authenticationFacade.getCurrentUser().getFollowers().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
+    @GetMapping("/{username}/follower")
+    public Response follower(@PathVariable("username") String username,
+                             @RequestParam(value = "page", required = false) Integer page,
+                             @RequestParam(value = "size", required = false) Integer size) {
+        Page<UserDTO> userDTOs = userService.getListFollowerByUser(username, PageUtil.initPage(page, size));
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 

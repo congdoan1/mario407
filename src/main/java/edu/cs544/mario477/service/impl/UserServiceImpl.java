@@ -14,6 +14,8 @@ import edu.cs544.mario477.service.StorageService;
 import edu.cs544.mario477.service.UserService;
 import edu.cs544.mario477.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -93,6 +95,17 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "username", username));
         return Mapper.map(user, UserDTO.class);
+    }
+
+    @Override
+    public Page<UserDTO> getListFollowingByUser(String username, Pageable pageable) {
+        Page<User> followings = userRepository.getListFollowingByUser(username, pageable);
+        return Mapper.mapPage(followings, UserDTO.class);
+    }
+
+    @Override
+    public Page<UserDTO> getListFollowerByUser(String username, Pageable pageable) {
+        return null;
     }
 
     @Override
