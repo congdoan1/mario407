@@ -24,7 +24,7 @@ public class RegistrationDTO {
     @NotBlank
     private String lastName;
 
-    @Email(message = "Wrong email format")
+    @Email
     @NotBlank
     private String email;
 
