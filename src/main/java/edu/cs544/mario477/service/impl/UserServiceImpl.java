@@ -92,9 +92,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUser(String username) {
+        User currentUser = authenticationFacade.getCurrentUser();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "username", username));
-        return Mapper.map(user, UserDTO.class);
+        UserDTO dto = Mapper.map(user, UserDTO.class);
+        if (!currentUser.getUsername().equals(username)) {
+            dto.setFollowing(user.getFollowers().contains(currentUser));
+        }
+        return dto;
     }
 
     @Override
