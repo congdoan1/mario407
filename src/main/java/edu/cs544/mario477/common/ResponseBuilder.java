@@ -7,7 +7,7 @@ import java.util.Collections;
 public class ResponseBuilder {
     private static final String DEFAULT_SUCCESS_MESSAGE = "success";
 
-    public static Response buildSuccess() {
+    public static Response<Void> buildSuccess() {
         return new Response()
                 .setCode(HttpStatus.OK)
                 .setMessage(DEFAULT_SUCCESS_MESSAGE);
@@ -52,8 +52,4 @@ public class ResponseBuilder {
                 .setMessage(message)
                 .setErrors(Collections.singletonList(error));
     }
-//
-//    public static Response<Object> buildError(ApiError error) {
-//        return new ResponseEntity<>(error, error.getStatus());
-//    }
 }

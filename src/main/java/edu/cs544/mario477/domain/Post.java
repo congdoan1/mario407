@@ -38,6 +38,7 @@ public class Post {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @Column(name = "is_healthy")
     private boolean isHealthy;
 
     @ManyToOne
@@ -61,5 +62,13 @@ public class Post {
     public void addMedia(Media media) {
         this.mediaList.add(media);
         media.setPost(this);
+    }
+
+    public int getNumberOfLikes() {
+        return likers.size();
+    }
+
+    public int getNumberOfComments() {
+        return comments.size();
     }
 }

@@ -37,6 +37,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Value("${jwtSigningKey}")
     private String jwtSigningKey;
 
+    @Value(("${oauth2.client-id}"))
+    private String clientId;
+
+    @Value(("${oauth2.client-secret}"))
+    private String clientSecret;
+
     @Override
     public void configure(final AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
         oauthServer
@@ -47,8 +53,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient("mario407")
-                .secret(passwordEncoder.encode("mario407"))
+                .withClient(clientId)
+                .secret(passwordEncoder.encode(clientSecret))
                 .authorizedGrantTypes("password", "refresh_token")
                 .scopes("read", "write")
                 .autoApprove(false)

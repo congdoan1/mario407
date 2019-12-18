@@ -1,9 +1,10 @@
 package edu.cs544.mario477.service.impl;
 
 import com.cloudinary.Cloudinary;
-import edu.cs544.mario477.common.Constants;
+import edu.cs544.mario477.domain.Comment;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
+import edu.cs544.mario477.dto.CommentDTO;
 import edu.cs544.mario477.dto.MailDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.exception.AppException;
@@ -15,20 +16,18 @@ import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.StorageService;
 import edu.cs544.mario477.util.EmailUtil;
 import edu.cs544.mario477.util.Mapper;
-import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -65,24 +64,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getPostByFollow(User currentUser, int page) {
-        Sort sort = Sort.by("postedDate").descending();
-        Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-        return postRepository
-                .findByOwnerIn(currentUser.getFollowings(), pageable)
-                .stream()
-                .map(post -> Mapper.map(post, PostDTO.class))
-                .collect(Collectors.toList());
+    public Page<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
+        List<User> users = new ArrayList<>(currentUser.getFollowings());
+        users.add(currentUser);
+        Page<Post> posts = postRepository.findByOwnerIn(users, pageable);
+        return Mapper.mapPage(posts, PostDTO.class);
     }
 
     @Override
-    public List<PostDTO> getTimelineById(long id, int page) {
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-        Sort sort = Sort.by("postedDate").descending();
-        Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-        return postRepository.findByOwner(currentUser, pageable).stream()
-                .map(post -> Mapper.map(post, PostDTO.class))
-                .collect(Collectors.toList());
+    public Page<PostDTO> getTimelineByUsername(String username, Pageable pageable) {
+        User queryUser;
+        if (!authenticationFacade.getCurrentUser().getUsername().equals(username)) {
+            queryUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+            if (authenticationFacade.getCurrentUser().getFollowings().indexOf(queryUser) < 0) {
+                System.out.println("do");
+                return null;
+            }
+        } else {
+            queryUser = authenticationFacade.getCurrentUser();
+        }
+        Page<Post> posts = postRepository.findByOwner(queryUser, pageable);
+        return Mapper.mapPage(posts, PostDTO.class);
     }
 
     @Override
@@ -137,5 +139,11 @@ public class PostServiceImpl implements PostService {
             currentPost.getLikers().remove(currentUser);
             postRepository.save(currentPost);
         }
+    }
+
+    @Override
+    public Page<CommentDTO> getCommentByPost(long postId, Pageable pageable) {
+        Page<Comment> comments = postRepository.getCommentByPostId(postId, pageable);
+        return Mapper.mapPage(comments, CommentDTO.class);
     }
 }

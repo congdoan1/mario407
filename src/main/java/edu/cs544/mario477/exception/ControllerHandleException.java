@@ -11,8 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -26,15 +27,18 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.naming.NoPermissionException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @ControllerAdvice
 public class ControllerHandleException extends ResponseEntityExceptionHandler {
 
     @Autowired
-    private MessageSource messageSource;
+    MessageSource messageSource;
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
@@ -68,12 +72,14 @@ public class ControllerHandleException extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
-        List<String> errors = new ArrayList<>();
-        ex.getBindingResult().getFieldErrors().forEach((error) -> {
-            errors.add(error.getDefaultMessage());
-        });
+        BindingResult result = ex.getBindingResult();
+        List<String> errorMessages = result.getAllErrors()
+                .stream()
+                .map(objectError -> messageSource.getMessage(objectError, Locale.getDefault()))
+                .collect(Collectors.toList());
         return ResponseEntity.badRequest().body(
-                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errors));
+                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errorMessages)
+        );
     }
 
     @Override
@@ -85,7 +91,8 @@ public class ControllerHandleException extends ResponseEntityExceptionHandler {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
         String error = "Malformed JSON request";
         return ResponseEntity.badRequest().body(
-                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, error, ex.getLocalizedMessage()));
+                ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, error, ex.getLocalizedMessage())
+        );
     }
 
     @Override

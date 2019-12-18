@@ -44,13 +44,16 @@ public class User {
     @Column(name = "birthday")
     private LocalDate birthday;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Column(name = "signup_date")
     private LocalDateTime signupDate;
 
     @Column(name = "enabled")
     private boolean enabled;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
 
@@ -80,5 +83,19 @@ public class User {
 
     public void addRole(Role role) {
         roles.add(role);
+    }
+
+    public void addAddress(Address address) {
+        if (address != null) {
+            if (this.address == null) {
+                this.address = address;
+            } else {
+                this.address.setStreet(address.getStreet());
+                this.address.setCity(address.getCity());
+                this.address.setState(address.getState());
+                this.address.setZipcode(address.getZipcode());
+                this.address.setCountry(address.getCountry());
+            }
+        }
     }
 }

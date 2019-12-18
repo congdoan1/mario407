@@ -10,6 +10,7 @@ import edu.cs544.mario477.service.CommentService;
 import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,29 +74,31 @@ public class PostController {
         return ResponseBuilder.buildSuccess(commentDTO);
     }
   
-    @GetMapping("/post")
-    public Response loadPost(@RequestParam(defaultValue = "0") int page) {
-        List<PostDTO> posts = postService.getPostByFollow(authenticationFacade.getCurrentUser(), page);
+    @GetMapping("/home")
+    public Response loadPost(@RequestParam(value = "page", required = false) Integer page,
+                             @RequestParam(value = "size", required = false) Integer size) {
+        Sort sort = Sort.by("postedDate").descending();
+        Page<PostDTO> posts = postService.getHomePosts(authenticationFacade.getCurrentUser(), PageUtil.initPage(page, size, sort));
         return ResponseBuilder.buildSuccess(posts);
     }
 
-    @GetMapping("/timeline")
-    public Response timeline(@RequestParam(defaultValue = "0") long id, @RequestParam(defaultValue = "1") int page) {
-        return ResponseBuilder.buildSuccess(postService.getTimelineById(
-               id == 0 ? authenticationFacade.getCurrentUser().getId() : id
-                , page)
-        );
-    }
-
-    @PostMapping("/like")
-    public Response like(@RequestParam(required = true) long postId) {
+    @PostMapping("/{postId}/like")
+    public Response like(@PathVariable long postId) {
         postService.likePost(authenticationFacade.getCurrentUser(), postId);
         return ResponseBuilder.buildSuccess();
     }
 
-    @PostMapping("/unlike")
-    public Response unlike(@RequestParam(required = true) long postId) {
+    @PostMapping("/{postId}/unlike")
+    public Response unlike(@PathVariable long postId) {
         postService.unlikePost(authenticationFacade.getCurrentUser(), postId);
         return ResponseBuilder.buildSuccess();
+    }
+
+    @GetMapping("/{postId}/comments")
+    public Response getComments(@PathVariable long postId,
+                                @RequestParam(value = "page", required = false) Integer page,
+                                @RequestParam(value = "size", required = false) Integer size) {
+        Page<CommentDTO> comments = postService.getCommentByPost(postId, PageUtil.initPage(page, size));
+        return ResponseBuilder.buildSuccess(comments);
     }
 }
