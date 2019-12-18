@@ -26,7 +26,7 @@ public class KeywordController {
     }
 
     @DeleteMapping("/{id}")
-    public Response<KeywordDTO> delete(@PathVariable Long id) {
+    public Response delete(@PathVariable Long id) {
         keywordService.delete(id);
         return ResponseBuilder.buildSuccess();
     }

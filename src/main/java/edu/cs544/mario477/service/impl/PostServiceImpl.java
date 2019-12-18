@@ -10,6 +10,7 @@ import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.CommentRepository;
+import edu.cs544.mario477.notification.Notification;
 import edu.cs544.mario477.repository.PostRepository;
 import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.IAuthenticationFacade;
@@ -50,6 +51,8 @@ public class PostServiceImpl implements PostService {
 
     private final EmailUtil emailUtil;
 
+    private final Notification notification;
+
     @Value("${cloudinary.folder}")
     private String folder;
 
@@ -60,7 +63,8 @@ public class PostServiceImpl implements PostService {
                            CommentRepository commentRepository,
                            Cloudinary cloudinary,
                            IAuthenticationFacade authenticationFacade,
-                           EmailUtil emailUtil) {
+                           EmailUtil emailUtil,
+                           Notification notification) {
         this.postRepository = postRepository;
         this.storageService = storageService;
         this.userRepository = userRepository;
@@ -68,6 +72,7 @@ public class PostServiceImpl implements PostService {
         this.cloudinary = cloudinary;
         this.authenticationFacade = authenticationFacade;
         this.emailUtil = emailUtil;
+        this.notification = notification;
     }
 
     @Override
@@ -108,15 +113,21 @@ public class PostServiceImpl implements PostService {
             }
             postRepository.save(post);
 
+            //Send new post message to RabbitMQ
+            notification.notifyNewPost(post);
+
+            if (postRepository.checkHealthyPost(post.getText()) > 0) {
+                notification.notifyUnHealthyPost(post);
+            }
+
             //Check malicious user's unhealthy post;
-            if (postRepository.countUnHealthyPost(post.getOwner().getId()) >= 20) {
+            if (postRepository.countUnhealthyPost(post.getOwner().getId()) >= 20) {
                 userRepository.updateUserStatus(post.getOwner().getId(), false);
-                MailDTO  mailDTO = new MailDTO();
+                MailDTO mailDTO = new MailDTO();
                 mailDTO.setFrom("");
                 mailDTO.setSubject("Lock account");
                 mailDTO.setText("Your account was locked by unhealthy posts. Contact admin for more information");
                 emailUtil.sendMail(mailDTO);
-
             }
 
             return Mapper.map(post, PostDTO.class);

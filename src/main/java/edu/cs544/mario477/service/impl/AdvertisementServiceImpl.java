@@ -72,13 +72,20 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         int age = LocalDate.now().getYear() - birthDay.getYear();
         Address address = user.getAddress();
 
-
-//        List<Advertisement> list = advertisementRepository.findByAgeAfterOrCountryIsLikeOrStateIsLikeOrCityIsLikeOrZipCode
-//                (age,address.getCountry(), address.getState(), address.getCity(), address.getZipcode());
-
         List<Advertisement> list = advertisementRepository.findByAgeBeforeAndCountryOrStateOrCity
                 (age, address.getCountry(), address.getState(), address.getCity());
 
+        if (list.size() <= 0)
+            list = advertisementRepository.findByAgeAfter(age);
+
+        if (list.size() <= 0)
+            list = advertisementRepository.findByCountryIgnoreCase(address.getCountry());
+
+        if (list.size() <= 0)
+            list = advertisementRepository.findByCityContains(address.getCity());
+
+        if (list.size() <= 0)
+            list = advertisementRepository.findByZipCode(address.getZipcode());
 
         return Mapper.mapList(list, AdvertisementDTO.class);
     }

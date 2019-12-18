@@ -1,9 +1,11 @@
 package edu.cs544.mario477.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 
 @Data
+@NoArgsConstructor
 public class MailDTO {
 
     private String from;

@@ -33,14 +33,14 @@ public class AdminController {
     }
 
     @PutMapping("/posts/{id}?active=true")
-    public Response<PostDTO> activePost(@PathVariable Long id) {
+    public Response activePost(@PathVariable Long id) {
         adminService.setPostStatus(id, true);
         return ResponseBuilder.buildSuccess();
 
     }
 
     @PutMapping("/posts/{id}?active=false")
-    public Response<PostDTO> deActivePost(@PathVariable Long id) {
+    public Response deActivePost(@PathVariable Long id) {
         adminService.setPostStatus(id, false);
         return ResponseBuilder.buildSuccess();
 
@@ -54,21 +54,21 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}?active=true")
-    public Response<UserDTO> activeUser(@PathVariable Long id) {
+    public Response activeUser(@PathVariable Long id) {
         adminService.setUserStatus(id, true);
         return ResponseBuilder.buildSuccess();
 
     }
 
     @PutMapping("/users/{id}?active=false")
-    public Response<UserDTO> deActiveUser(@PathVariable Long id) {
+    public Response deActiveUser(@PathVariable Long id) {
         adminService.setUserStatus(id, false);
         return ResponseBuilder.buildSuccess();
 
     }
 
     @PostMapping("/mail")
-    public Response<String> sendmail(){
+    public Response sendmail(){
         MailDTO dto = new MailDTO("duythong03@gmail.com","pduythong@gmail.com","subject","test");
 
         emailUtil.sendMail(dto);
