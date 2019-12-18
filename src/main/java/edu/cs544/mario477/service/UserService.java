@@ -11,7 +11,7 @@ public interface UserService {
 
     UserDTO register(RegistrationDTO dto);
 
-    User followUser(long id);
+    User followUser(String username);
 
     UserDTO getUser(String username);
 
@@ -19,7 +19,7 @@ public interface UserService {
 
     Page<UserDTO> getListFollowerByUser(String username, Pageable pageable);
 
-    User unfollowUser(long id);
+    User unfollowUser(String username);
 
     void updateUser(UserDTO dto);
 

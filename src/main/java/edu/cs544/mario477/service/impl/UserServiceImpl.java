@@ -67,9 +67,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User followUser(long id) {
+    public User followUser(String username) {
         User currentUser = authenticationFacade.getCurrentUser();
-        User userToFollow = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        User userToFollow = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "id", username));
         int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
         if (checkIndex < 0) {
             currentUser.getFollowings().add(userToFollow);
@@ -79,9 +79,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User unfollowUser(long id) {
+    public User unfollowUser(String username) {
         User currentUser = authenticationFacade.getCurrentUser();
-        User userToFollow = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        User userToFollow = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
         if (checkIndex > -1) {
             currentUser.getFollowings().remove(checkIndex);

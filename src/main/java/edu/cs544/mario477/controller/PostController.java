@@ -93,4 +93,12 @@ public class PostController {
         postService.unlikePost(authenticationFacade.getCurrentUser(), postId);
         return ResponseBuilder.buildSuccess();
     }
+
+    @GetMapping("/{postId}/comments")
+    public Response getComments(@PathVariable long postId,
+                                @RequestParam(value = "page", required = false) Integer page,
+                                @RequestParam(value = "size", required = false) Integer size) {
+        Page<CommentDTO> comments = postService.getCommentByPost(postId, PageUtil.initPage(page, size));
+        return ResponseBuilder.buildSuccess(comments);
+    }
 }

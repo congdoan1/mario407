@@ -39,21 +39,21 @@ public class UserController {
         this.authenticationFacade = authenticationFacade;
     }
 
-    @PostMapping("/follow")
-    public Response follow(@RequestParam(defaultValue = "0") long id) {
-        User user = userService.followUser(id);
+    @PostMapping("/{username}/follow")
+    public Response follow(@PathVariable("username") String username) {
+        User user = userService.followUser(username);
         List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
-    @PostMapping("/unfollow")
-    public Response unfollow(@RequestParam(defaultValue = "0") long id) {
-        User user = userService.unfollowUser(id);
+    @PostMapping("/{username}/unfollow")
+    public Response unfollow(@PathVariable("username") String username) {
+        User user = userService.unfollowUser(username);
         List<UserDTO> userDTOs = user.getFollowings().stream().map(user1 -> Mapper.map(user1, UserDTO.class)).collect(Collectors.toList());
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
-    @GetMapping("/{username}/following")
+    @GetMapping("/{username}/followings")
     public Response follow(@PathVariable("username") String username,
                            @RequestParam(value = "page", required = false) Integer page,
                            @RequestParam(value = "size", required = false) Integer size) {
@@ -61,7 +61,7 @@ public class UserController {
         return ResponseBuilder.buildSuccess(userDTOs);
     }
 
-    @GetMapping("/{username}/follower")
+    @GetMapping("/{username}/followers")
     public Response follower(@PathVariable("username") String username,
                              @RequestParam(value = "page", required = false) Integer page,
                              @RequestParam(value = "size", required = false) Integer size) {
@@ -84,8 +84,9 @@ public class UserController {
         return ResponseBuilder.buildSuccess(postService.getTimelineByUsername(username, PageUtil.initPage(page, size, sort)));
     }
 
-    @PutMapping
-    public Response<Void> updateUser(@RequestBody @Valid UserDTO userDTO) {
+    @PutMapping("/{username}")
+    public Response<Void> updateUser(@PathVariable String username,
+            @RequestBody @Valid UserDTO userDTO) {
         userService.updateUser(userDTO);
         return ResponseBuilder.buildSuccess();
     }
