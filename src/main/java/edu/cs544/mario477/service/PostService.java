@@ -1,16 +1,11 @@
 package edu.cs544.mario477.service;
 
-import edu.cs544.mario477.domain.Comment;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.CommentDTO;
 import edu.cs544.mario477.dto.PostDTO;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
 
 public interface PostService {
 

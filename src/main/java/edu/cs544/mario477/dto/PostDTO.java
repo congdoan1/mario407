@@ -1,10 +1,8 @@
 package edu.cs544.mario477.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.cs544.mario477.domain.Media;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Set;
 

@@ -1,20 +1,22 @@
 package edu.cs544.mario477.service.impl;
 
 import com.cloudinary.Cloudinary;
-import edu.cs544.mario477.common.Constants;
 import edu.cs544.mario477.domain.Comment;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.CommentDTO;
+import edu.cs544.mario477.dto.MailDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.CommentRepository;
+import edu.cs544.mario477.notification.Notification;
 import edu.cs544.mario477.repository.PostRepository;
 import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.IAuthenticationFacade;
 import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.StorageService;
+import edu.cs544.mario477.util.EmailUtil;
 import edu.cs544.mario477.util.Mapper;
 import edu.cs544.mario477.util.PageUtil;
 import javafx.geometry.Pos;
@@ -22,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,8 +32,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -50,6 +49,10 @@ public class PostServiceImpl implements PostService {
 
     private final IAuthenticationFacade authenticationFacade;
 
+    private final EmailUtil emailUtil;
+
+    private final Notification notification;
+
     @Value("${cloudinary.folder}")
     private String folder;
 
@@ -59,13 +62,17 @@ public class PostServiceImpl implements PostService {
                            UserRepository userRepository,
                            CommentRepository commentRepository,
                            Cloudinary cloudinary,
-                           IAuthenticationFacade authenticationFacade) {
+                           IAuthenticationFacade authenticationFacade,
+                           EmailUtil emailUtil,
+                           Notification notification) {
         this.postRepository = postRepository;
         this.storageService = storageService;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.cloudinary = cloudinary;
         this.authenticationFacade = authenticationFacade;
+        this.emailUtil = emailUtil;
+        this.notification = notification;
     }
 
     @Override
@@ -105,6 +112,24 @@ public class PostServiceImpl implements PostService {
                 post.addMedia(storageService.upload(files[i], post.getId(), i));
             }
             postRepository.save(post);
+
+            //Send new post message to RabbitMQ
+            notification.notifyNewPost(post);
+
+            if (postRepository.checkHealthyPost(post.getText()) > 0) {
+                notification.notifyUnHealthyPost(post);
+            }
+
+            //Check malicious user's unhealthy post;
+            if (postRepository.countUnhealthyPost(post.getOwner().getId()) >= 20) {
+                userRepository.updateUserStatus(post.getOwner().getId(), false);
+                MailDTO mailDTO = new MailDTO();
+                mailDTO.setFrom("");
+                mailDTO.setSubject("Lock account");
+                mailDTO.setText("Your account was locked by unhealthy posts. Contact admin for more information");
+                emailUtil.sendMail(mailDTO);
+            }
+
             return Mapper.map(post, PostDTO.class);
         } catch (IOException e) {
             throw new AppException(e.getLocalizedMessage());
