@@ -3,6 +3,8 @@ package edu.cs544.mario477.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -46,12 +48,14 @@ public class Post {
     private User owner;
 
     @OneToMany(mappedBy = "post")
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Media> mediaList = new HashSet<>();
 
     @ManyToMany
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private List<User> likers = new ArrayList<>();
 
     public Post(String text, User owner) {

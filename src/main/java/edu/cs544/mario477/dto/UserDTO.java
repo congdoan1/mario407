@@ -35,4 +35,10 @@ public class UserDTO {
     private AddressDTO address;
 
     private boolean isFollowing;
+
+    private int numberOfPosts;
+
+    private int numberOfFollowers;
+
+    private int numberOfFollowings;
 }
