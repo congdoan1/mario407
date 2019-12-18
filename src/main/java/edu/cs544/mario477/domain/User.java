@@ -3,6 +3,8 @@ package edu.cs544.mario477.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -64,6 +66,7 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "owner")
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<Post> posts = new HashSet<>();
 
     @OneToMany(mappedBy = "owner")
@@ -73,12 +76,14 @@ public class User {
     @JoinTable(name = "following",
             joinColumns = {@JoinColumn(name = "following_id")},
             inverseJoinColumns = {@JoinColumn(name = "follower_id")})
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private List<User> followers = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "following",
             joinColumns = {@JoinColumn(name = "follower_id")},
             inverseJoinColumns = {@JoinColumn(name = "following_id")})
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private List<User> followings = new ArrayList<>();
 
     public void addRole(Role role) {

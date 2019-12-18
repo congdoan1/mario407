@@ -96,6 +96,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, "username", username));
         UserDTO dto = Mapper.map(user, UserDTO.class);
+        dto.setNumberOfPosts(user.getPosts().size());
+        dto.setNumberOfFollowers(user.getFollowers().size());
+        dto.setNumberOfFollowings(user.getFollowings().size());
         if (!currentUser.getUsername().equals(username)) {
             dto.setFollowing(user.getFollowers().contains(currentUser));
         }
