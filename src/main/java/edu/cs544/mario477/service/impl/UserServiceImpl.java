@@ -105,7 +105,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDTO> getListFollowerByUser(String username, Pageable pageable) {
-        return null;
+        Page<User> followers = userRepository.getListFollowerByUser(username, pageable);
+        return Mapper.mapPage(followers, UserDTO.class);
     }
 
     @Override
