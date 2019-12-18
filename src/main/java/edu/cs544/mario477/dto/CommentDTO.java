@@ -12,7 +12,7 @@ public class CommentDTO {
 
     private String text;
 
-    private LocalDateTime postedDate;
+    private LocalDateTime commentedDate;
 
     private LocalDateTime lastModifiedDate;
 

@@ -29,4 +29,6 @@ public class PostDTO {
     private int numberOfLikes;
 
     private int numberOfComments;
+
+    private boolean isLiked;
 }
