@@ -22,4 +22,6 @@ public interface PostService {
     void unlikePost(User currentUser, long postId);
 
     Page<CommentDTO> getCommentByPost(long postId, Pageable pageable);
+
+    PostDTO getPost(Long postId);
 }

@@ -101,4 +101,10 @@ public class PostController {
         Page<CommentDTO> comments = postService.getCommentByPost(postId, PageUtil.initPage(page, size));
         return ResponseBuilder.buildSuccess(comments);
     }
+
+    @GetMapping("/{postId}")
+    public Response getPost(@PathVariable("postId") Long postId) {
+        PostDTO postDTO = postService.getPost(postId);
+        return ResponseBuilder.buildSuccess(postDTO);
+    }
 }

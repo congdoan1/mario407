@@ -33,4 +33,6 @@ public class UserDTO {
     private boolean enabled;
 
     private AddressDTO address;
+
+    private boolean isFollowing;
 }

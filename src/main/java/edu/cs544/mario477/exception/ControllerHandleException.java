@@ -28,7 +28,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.naming.NoPermissionException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -73,10 +72,11 @@ public class ControllerHandleException extends ResponseEntityExceptionHandler {
             HttpStatus status,
             WebRequest request) {
         BindingResult result = ex.getBindingResult();
-        List<String> errorMessages = result.getAllErrors()
+        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errorMessages = result.getAllErrors()
                 .stream()
-                .map(objectError -> messageSource.getMessage(objectError, Locale.getDefault()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(objectError -> ((FieldError) objectError).getField(),
+                        objectError -> messageSource.getMessage(objectError, Locale.getDefault())));
         return ResponseEntity.badRequest().body(
                 ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errorMessages)
         );

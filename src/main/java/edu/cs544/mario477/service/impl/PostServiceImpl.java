@@ -9,6 +9,7 @@ import edu.cs544.mario477.dto.MailDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
+import edu.cs544.mario477.repository.CommentRepository;
 import edu.cs544.mario477.repository.PostRepository;
 import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.IAuthenticationFacade;
@@ -16,6 +17,8 @@ import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.StorageService;
 import edu.cs544.mario477.util.EmailUtil;
 import edu.cs544.mario477.util.Mapper;
+import edu.cs544.mario477.util.PageUtil;
+import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -39,6 +42,8 @@ public class PostServiceImpl implements PostService {
 
     private final UserRepository userRepository;
 
+    private final CommentRepository commentRepository;
+
     private final Cloudinary cloudinary;
 
     private final IAuthenticationFacade authenticationFacade;
@@ -52,12 +57,14 @@ public class PostServiceImpl implements PostService {
     public PostServiceImpl(PostRepository postRepository,
                            StorageService storageService,
                            UserRepository userRepository,
+                           CommentRepository commentRepository,
                            Cloudinary cloudinary,
                            IAuthenticationFacade authenticationFacade,
                            EmailUtil emailUtil) {
         this.postRepository = postRepository;
         this.storageService = storageService;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
         this.cloudinary = cloudinary;
         this.authenticationFacade = authenticationFacade;
         this.emailUtil = emailUtil;
@@ -143,7 +150,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<CommentDTO> getCommentByPost(long postId, Pageable pageable) {
-        Page<Comment> comments = postRepository.getCommentByPostId(postId, pageable);
+        Post currentPost = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
+        Page<Comment> comments = commentRepository.findByPost(currentPost, pageable);
         return Mapper.mapPage(comments, CommentDTO.class);
+    }
+
+    @Override
+    public PostDTO getPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(Post.class, "id", postId));
+        return Mapper.map(post, PostDTO.class);
     }
 }
