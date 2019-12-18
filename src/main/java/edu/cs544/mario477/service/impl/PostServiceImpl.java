@@ -2,8 +2,10 @@ package edu.cs544.mario477.service.impl;
 
 import com.cloudinary.Cloudinary;
 import edu.cs544.mario477.common.Constants;
+import edu.cs544.mario477.domain.Comment;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
+import edu.cs544.mario477.dto.CommentDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,5 +126,11 @@ public class PostServiceImpl implements PostService {
             currentPost.getLikers().remove(currentUser);
             postRepository.save(currentPost);
         }
+    }
+
+    @Override
+    public Page<CommentDTO> getCommentByPost(long postId, Pageable pageable) {
+        Page<Comment> comments = postRepository.getCommentByPostId(postId, pageable);
+        return Mapper.mapPage(comments, CommentDTO.class);
     }
 }

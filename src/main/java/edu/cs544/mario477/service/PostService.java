@@ -1,6 +1,8 @@
 package edu.cs544.mario477.service;
 
+import edu.cs544.mario477.domain.Comment;
 import edu.cs544.mario477.domain.User;
+import edu.cs544.mario477.dto.CommentDTO;
 import edu.cs544.mario477.dto.PostDTO;
 
 import org.springframework.data.domain.Page;
@@ -23,4 +25,6 @@ public interface PostService {
     void likePost(User currentUser, long postId);
 
     void unlikePost(User currentUser, long postId);
+
+    Page<CommentDTO> getCommentByPost(long postId, Pageable pageable);
 }
