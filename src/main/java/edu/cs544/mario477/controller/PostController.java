@@ -68,9 +68,7 @@ public class PostController {
     @PostMapping("/{id}/comments")
     public Response comment(@PathVariable("id") Long postId,
                             @RequestBody @Valid CommentDTO dto) {
-
         CommentDTO commentDTO = commentService.comment(postId, dto.getText());
-
         return ResponseBuilder.buildSuccess(commentDTO);
     }
   
