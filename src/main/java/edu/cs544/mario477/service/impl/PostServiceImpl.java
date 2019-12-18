@@ -17,6 +17,7 @@ import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.StorageService;
 import edu.cs544.mario477.util.Mapper;
 import edu.cs544.mario477.util.PageUtil;
+import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -138,5 +139,12 @@ public class PostServiceImpl implements PostService {
         Post currentPost = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
         Page<Comment> comments = commentRepository.findByPost(currentPost, pageable);
         return Mapper.mapPage(comments, CommentDTO.class);
+    }
+
+    @Override
+    public PostDTO getPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(Post.class, "id", postId));
+        return Mapper.map(post, PostDTO.class);
     }
 }
