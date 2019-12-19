@@ -110,11 +110,18 @@ public class UserController {
 
     }
 
-    @PostMapping("/users/{id}")
-    public Response setUserStatus(@PathVariable Long id,
-                                  @Param("active") Boolean active) {
+    @PostMapping("/{id}/active")
+    public Response setUserActive(@PathVariable Long id) {
 
-        adminService.setUserStatus(id, active);
+        adminService.setUserStatus(id, true);
+        return ResponseBuilder.buildSuccess();
+
+    }
+
+    @PostMapping("/{id}/deActive")
+    public Response setUserDeActive(@PathVariable Long id) {
+
+        adminService.setUserStatus(id, false);
         return ResponseBuilder.buildSuccess();
 
     }
