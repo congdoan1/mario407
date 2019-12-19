@@ -6,6 +6,7 @@ import edu.cs544.mario477.domain.Role;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.RegistrationDTO;
 import edu.cs544.mario477.dto.UserDTO;
+import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.RoleRepository;
 import edu.cs544.mario477.repository.UserRepository;
@@ -23,6 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -65,11 +69,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User followUser(String username) {
         User currentUser = authenticationFacade.getCurrentUser();
-        User userToFollow = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "id", username));
-        int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
-        if (checkIndex < 0) {
-            currentUser.getFollowings().add(userToFollow);
-            userRepository.save(userToFollow);
+        if (!authenticationFacade.getCurrentUser().getUsername().equals(username)) {
+            User userToFollow = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "id", username));
+            int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
+            if (checkIndex < 0) {
+                currentUser.getFollowings().add(userToFollow);
+                userRepository.save(userToFollow);
+            }
         }
         return currentUser;
     }
@@ -115,14 +121,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(UserDTO dto) {
-        User user = authenticationFacade.getCurrentUser();
-        user.setEmail(dto.getEmail());
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setPhone(dto.getPhone());
-        user.setBirthday(dto.getBirthday());
-        user.addAddress(Mapper.map(dto.getAddress(), Address.class));
-        userRepository.save(user);
+        if (dto.getUsername().equals(authenticationFacade.getCurrentUser().getUsername())) {
+            User user = authenticationFacade.getCurrentUser();
+            user.setEmail(dto.getEmail());
+            user.setFirstName(dto.getFirstName());
+            user.setLastName(dto.getLastName());
+            user.setPhone(dto.getPhone());
+            user.setBirthday(dto.getBirthday());
+            user.addAddress(Mapper.map(dto.getAddress(), Address.class));
+            userRepository.save(user);
+        } else {
+            throw new AppException("You do not have permission to update this user information");
+        }
+
     }
 
     @Override
@@ -133,6 +144,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserDTO> getListSuggested(Pageable pageable) {
+        List<Long> excludeList = authenticationFacade.getCurrentUser().getFollowings().stream().map(user -> user.getId()).collect(Collectors.toList());
+        excludeList.add(authenticationFacade.getCurrentUser().getId());
+        Page<User> users = userRepository.findByIdNotIn(excludeList, pageable);
+        return Mapper.mapPage(users, UserDTO.class);
+    }
+
     public void claimUser(Long id, Boolean status) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         user.setClaim(status);

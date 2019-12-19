@@ -35,5 +35,7 @@ public interface UserRepository extends BaseRepository<User, Long> {
     @Query("select u.followers from User u where u.username = :username")
     Page<User> getListFollowerByUser(@Param("username") String username, Pageable pageable);
 
+    Page<User> findByIdNotIn(@Param("users") List<Long> users, Pageable pageable);
+
     Page<User> getByClaimIsTrue(Pageable pageable);
 }

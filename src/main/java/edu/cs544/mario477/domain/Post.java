@@ -80,4 +80,7 @@ public class Post {
     public int getNumberOfComments() {
         return comments.size();
     }
+
+    @Transient
+    private boolean isLiked;
 }

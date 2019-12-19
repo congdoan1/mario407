@@ -100,6 +100,13 @@ public class UserController {
         return ResponseBuilder.buildSuccess();
     }
 
+    @GetMapping("/suggested")
+    public Response getSuggestedUser(@RequestParam(value = "page", required = false) Integer page,
+                                     @RequestParam(value = "size", required = false) Integer size) {
+        Page<UserDTO> users = userService.getListSuggested(PageUtil.initPage(page, size));
+        return ResponseBuilder.buildSuccess(users);
+    }
+
     @GetMapping("/users")
     public Response maliciousUser(@RequestParam("malicious") Boolean malicious,
                                   @RequestParam(value = "page", required = false) Integer page,
@@ -115,7 +122,6 @@ public class UserController {
 
         adminService.setUserStatus(id, true);
         return ResponseBuilder.buildSuccess();
-
     }
 
     @PostMapping("/{id}/deActive")

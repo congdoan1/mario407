@@ -1,7 +1,9 @@
 package edu.cs544.mario477.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
@@ -14,8 +16,10 @@ public class PostDTO {
     @NotEmpty
     private String text;
 
+    @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     private LocalDateTime postedDate;
 
+    @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     private LocalDateTime lastModifiedDate;
 
     private boolean enabled;
@@ -28,4 +32,6 @@ public class PostDTO {
     private int numberOfLikes;
 
     private int numberOfComments;
+
+    private boolean isLiked;
 }

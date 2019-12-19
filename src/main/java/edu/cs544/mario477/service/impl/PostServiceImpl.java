@@ -19,6 +19,7 @@ import edu.cs544.mario477.util.EmailUtil;
 import edu.cs544.mario477.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +31,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +83,9 @@ public class PostServiceImpl implements PostService {
         List<User> users = new ArrayList<>(currentUser.getFollowings());
         users.add(currentUser);
         Page<Post> posts = postRepository.findByOwnerIn(users, pageable);
+        for (Post p : posts.getContent()) {
+            p.setLiked(p.getLikers().contains(currentUser));
+        }
         return Mapper.mapPage(posts, PostDTO.class);
     }
 
@@ -90,8 +95,7 @@ public class PostServiceImpl implements PostService {
         if (!authenticationFacade.getCurrentUser().getUsername().equals(username)) {
             queryUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
             if (authenticationFacade.getCurrentUser().getFollowings().indexOf(queryUser) < 0) {
-                System.out.println("do");
-                return null;
+                return new PageImpl<>(Collections.emptyList(), pageable, 0);
             }
         } else {
             queryUser = authenticationFacade.getCurrentUser();
@@ -118,7 +122,6 @@ public class PostServiceImpl implements PostService {
 
             //Send new post message to RabbitMQ
 //            notification.notifyNewPost(post);
-
 //            if (postRepository.checkHealthyPost(post.getText()) > 0) {
 //                notification.notifyUnHealthyPost(post);
 //            }
@@ -141,7 +144,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostDTO> searchPost(String q, Pageable pageable) {
-        return null;
+        return Mapper.mapPage(postRepository.findAll(pageable), PostDTO.class);
     }
 
     @Override

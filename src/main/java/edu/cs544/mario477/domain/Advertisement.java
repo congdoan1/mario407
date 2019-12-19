@@ -20,7 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "advertisement")
-public class Advertisement {
+public class    Advertisement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
