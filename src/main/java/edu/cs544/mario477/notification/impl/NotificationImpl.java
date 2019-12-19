@@ -29,15 +29,18 @@ public class NotificationImpl implements edu.cs544.mario477.notification.Notific
                 NotificationRoute.NEW_POST.getValue(),
                 followers);
 
-        rabbitTemplate.convertAndSend(
-                NotificationExchange.POST.getValue(),
-                NotificationRoute.CHECK_UNHEALTHY_POST.getValue(),
-                post.getId());
+//        rabbitTemplate.convertAndSend(
+//                NotificationExchange.POST.getValue(),
+//                NotificationRoute.CHECK_UNHEALTHY_POST.getValue(),
+//                post.getId());
 
     }
 
     @Override
     public void notifyUnHealthyPost(Post post) {
-
+        rabbitTemplate.convertAndSend(
+                NotificationExchange.POST.getValue(),
+                NotificationRoute.CHECK_UNHEALTHY_POST.getValue(),
+                post.getId());
     }
 }

@@ -124,16 +124,16 @@ public class PostController {
 
     }
 
-    @PostMapping("/id}/active")
-    public Response setPostActive(@PathVariable Long id) {
+    @PostMapping("/{id}/active")
+    public Response setPostActive(@PathVariable("id") Long id) {
 
         adminService.setPostStatus(id, true);
         return ResponseBuilder.buildSuccess();
 
     }
 
-    @PostMapping("/id}/deActive")
-    public Response setPostDeActive(@PathVariable Long id) {
+    @PostMapping("/{id}/deActive")
+    public Response setPostDeActive(@PathVariable("id") Long id) {
 
         adminService.setPostStatus(id, false);
         return ResponseBuilder.buildSuccess();

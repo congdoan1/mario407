@@ -77,7 +77,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
         List<User> users = new ArrayList<>(currentUser.getFollowings());
         users.add(currentUser);
-        Page<Post> posts = postRepository.findByOwnerInAndAndEnabledIsTrue(users, pageable);
+        Page<Post> posts = postRepository.findByOwnerInAndAndEnabledIsTrueAndHealthyIsTrue(users, pageable);
         for (Post p : posts.getContent()) {
             p.setLiked(p.getLikers().contains(currentUser));
         }
@@ -95,7 +95,7 @@ public class PostServiceImpl implements PostService {
         } else {
             queryUser = authenticationFacade.getCurrentUser();
         }
-        Page<Post> posts = postRepository.findByOwnerAndEnabledIsTrue(queryUser, pageable);
+        Page<Post> posts = postRepository.findByOwnerAndEnabledIsTrueAndHealthyIsTrue(queryUser, pageable);
         return Mapper.mapPage(posts, PostDTO.class);
     }
 
@@ -115,11 +115,14 @@ public class PostServiceImpl implements PostService {
             }
             postRepository.save(post);
 
-            //Send new post message to RabbitMQ
-//            notification.notifyNewPost(post);
-//            if (postRepository.checkHealthyPost(post.getText()) > 0) {
-//                notification.notifyUnHealthyPost(post);
-//            }
+//            Send new post message to RabbitMQ
+            if (notify != null && notify) {
+                notification.notifyNewPost(post);
+            }
+
+            if (postRepository.checkHealthyPost(post.getText()) > 0) {
+                notification.notifyUnHealthyPost(post);
+            }
 
             //Check malicious user's unhealthy post;
 //            if (postRepository.countUnhealthyPost(post.getOwner().getId()) >= 20) {
