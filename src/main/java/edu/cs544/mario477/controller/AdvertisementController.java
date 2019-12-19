@@ -2,18 +2,20 @@ package edu.cs544.mario477.controller;
 
 import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
+import edu.cs544.mario477.domain.Advertisement;
 import edu.cs544.mario477.dto.AdvertisementDTO;
 import edu.cs544.mario477.service.AdvertisementService;
+import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/advertisements")
+@RequestMapping("/ads")
 public class AdvertisementController {
-
 
     private AdvertisementService advertisementService;
 
@@ -21,7 +23,6 @@ public class AdvertisementController {
     public AdvertisementController(AdvertisementService advertisementService) {
         this.advertisementService = advertisementService;
     }
-
 
     @PostMapping
     public Response<AdvertisementDTO> add(@RequestBody @Valid AdvertisementDTO inputDTO) {
@@ -47,14 +48,17 @@ public class AdvertisementController {
     }
 
     @GetMapping
-    public Response<List<AdvertisementDTO>> list(@RequestParam(defaultValue = "0") Integer page) {
-        return ResponseBuilder.buildSuccess(advertisementService.findAll(page));
+    public Response list(@RequestParam(value = "page", required = false) Integer page,
+                         @RequestParam(value = "size", required = false) Integer size) {
+        Page<AdvertisementDTO> ads = advertisementService.findAll(PageUtil.initPage(page, size));
+
+        return ResponseBuilder.buildSuccess(ads);
     }
 
-    @GetMapping(value = "/match-user/{userId}")
-    public Response<List<AdvertisementDTO>> listMatchUser(@PathVariable Long userId) {
-
-        return ResponseBuilder.buildSuccess(advertisementService.findAdvertisementMatchWithUser(userId));
-    }
+//    @GetMapping(value = "/match-user/{userId}")
+//    public Response listMatchUser(@PathVariable Long userId) {
+//
+//        return ResponseBuilder.buildSuccess(advertisementService.findAdvertisementMatchWithUser(userId));
+//    }
 
 }
