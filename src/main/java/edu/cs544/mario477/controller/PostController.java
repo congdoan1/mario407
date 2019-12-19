@@ -63,10 +63,10 @@ public class PostController {
     }
 
     @GetMapping
-    public Response search(@RequestParam("q") String q,
-                           @RequestParam("isHealthy") Boolean isHealthy,
-                           @RequestParam("page") Integer page,
-                           @RequestParam("size") Integer size) {
+    public Response search(@RequestParam(value = "q", required = false) String q,
+                           @RequestParam(value = "isHealthy", required = false) Boolean isHealthy,
+                           @RequestParam(value = "page", required = false) Integer page,
+                           @RequestParam(value = "size", required = false) Integer size) {
 
         //Filter unhealthy posts.
         if (isHealthy) {

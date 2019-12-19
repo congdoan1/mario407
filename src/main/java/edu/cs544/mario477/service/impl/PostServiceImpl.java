@@ -120,7 +120,6 @@ public class PostServiceImpl implements PostService {
 
             //Send new post message to RabbitMQ
 //            notification.notifyNewPost(post);
-
 //            if (postRepository.checkHealthyPost(post.getText()) > 0) {
 //                notification.notifyUnHealthyPost(post);
 //            }

@@ -6,6 +6,7 @@ import edu.cs544.mario477.domain.Role;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.RegistrationDTO;
 import edu.cs544.mario477.dto.UserDTO;
+import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
 import edu.cs544.mario477.repository.RoleRepository;
 import edu.cs544.mario477.repository.UserRepository;
@@ -72,11 +73,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User followUser(String username) {
         User currentUser = authenticationFacade.getCurrentUser();
-        User userToFollow = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "id", username));
-        int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
-        if (checkIndex < 0) {
-            currentUser.getFollowings().add(userToFollow);
-            userRepository.save(userToFollow);
+        if (!authenticationFacade.getCurrentUser().getUsername().equals(username)) {
+            User userToFollow = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "id", username));
+            int checkIndex = currentUser.getFollowings().indexOf(userToFollow);
+            if (checkIndex < 0) {
+                currentUser.getFollowings().add(userToFollow);
+                userRepository.save(userToFollow);
+            }
         }
         return currentUser;
     }
@@ -122,14 +125,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(UserDTO dto) {
-        User user = authenticationFacade.getCurrentUser();
-        user.setEmail(dto.getEmail());
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setPhone(dto.getPhone());
-        user.setBirthday(dto.getBirthday());
-        user.addAddress(Mapper.map(dto.getAddress(), Address.class));
-        userRepository.save(user);
+        if (dto.getUsername().equals(authenticationFacade.getCurrentUser().getUsername())) {
+            User user = authenticationFacade.getCurrentUser();
+            user.setEmail(dto.getEmail());
+            user.setFirstName(dto.getFirstName());
+            user.setLastName(dto.getLastName());
+            user.setPhone(dto.getPhone());
+            user.setBirthday(dto.getBirthday());
+            user.addAddress(Mapper.map(dto.getAddress(), Address.class));
+            userRepository.save(user);
+        } else {
+            throw new AppException("You do not have permission to update this user information");
+        }
+
     }
 
     @Override
