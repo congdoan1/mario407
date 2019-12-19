@@ -13,7 +13,6 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -27,10 +26,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.naming.NoPermissionException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -72,10 +69,11 @@ public class ControllerHandleException extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
+        System.out.println("acc" + request.getLocale());
         BindingResult result = ex.getBindingResult();
         List<String> errorMessages = result.getAllErrors()
                 .stream()
-                .map(objectError -> messageSource.getMessage(objectError, Locale.getDefault()))
+                .map(objectError -> messageSource.getMessage(objectError, request.getLocale()))
                 .collect(Collectors.toList());
         return ResponseEntity.badRequest().body(
                 ResponseBuilder.buildFail(HttpStatus.BAD_REQUEST, "Validation error", errorMessages)

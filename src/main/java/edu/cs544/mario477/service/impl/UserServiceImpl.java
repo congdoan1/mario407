@@ -55,8 +55,8 @@ public class UserServiceImpl implements UserService {
         user.setSignupDate(LocalDateTime.now());
         user.setEnabled(true);
 
-        Role adminRole = roleRepository.findByName("ADMIN");
-        user.addRole(adminRole);
+        Role userRole = roleRepository.findByName("USER");
+        user.addRole(userRole);
 
         userRepository.save(user);
         return Mapper.map(user, UserDTO.class);
