@@ -68,11 +68,6 @@ public class PostController {
                            @RequestParam(value = "page", required = false) Integer page,
                            @RequestParam(value = "size", required = false) Integer size) {
 
-        //Filter unhealthy posts.
-        if (isHealthy) {
-            postService.findUnhealthyPost(PageUtil.initPage(page, size));
-        }
-
         Page<PostDTO> p = postService.searchPost(q, PageUtil.initPage(page, size));
 
         return ResponseBuilder.buildSuccess(p);
@@ -119,7 +114,7 @@ public class PostController {
         return ResponseBuilder.buildSuccess(postDTO);
     }
 
-    @GetMapping("/posts")
+    @GetMapping("/filter")
     public Response filterPost(@RequestParam(defaultValue = "false") Boolean isHealthy,
                                @RequestParam(value = "page", required = false) Integer page,
                                @RequestParam(value = "size", required = false) Integer size) {
@@ -130,11 +125,18 @@ public class PostController {
 
     }
 
-    @PostMapping("/posts/{id}")
-    public Response setPostStatus(@PathVariable Long id,
-                                  @Param("active") Boolean active) {
+    @PostMapping("/id}/active")
+    public Response setPostActive(@PathVariable Long id) {
 
-        adminService.setPostStatus(id, active);
+        adminService.setPostStatus(id, true);
+        return ResponseBuilder.buildSuccess();
+
+    }
+
+    @PostMapping("/id}/deActive")
+    public Response setPostDeActive(@PathVariable Long id) {
+
+        adminService.setPostStatus(id, false);
         return ResponseBuilder.buildSuccess();
 
     }

@@ -35,9 +35,7 @@ public interface UserRepository extends BaseRepository<User, Long> {
     @Query("select u.followers from User u where u.username = :username")
     Page<User> getListFollowerByUser(@Param("username") String username, Pageable pageable);
 
-//    @Query(
-//        value = "select u from User u join u.followers fl where u.id not in :users group by u Order By followersCount desc",
-//        countQuery = "select count(u) from User u"
-//    )
     Page<User> findByIdNotIn(@Param("users") List<Long> users, Pageable pageable);
+
+    Page<User> getByClaimIsTrue(Pageable pageable);
 }

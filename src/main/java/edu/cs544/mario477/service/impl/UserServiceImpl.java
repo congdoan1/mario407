@@ -32,15 +32,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-
-    private RoleRepository roleRepository;
-
-    private PasswordEncoder passwordEncoder;
-
     private final IAuthenticationFacade authenticationFacade;
-
     private final StorageService storageService;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
@@ -63,8 +59,8 @@ public class UserServiceImpl implements UserService {
         user.setSignupDate(LocalDateTime.now());
         user.setEnabled(true);
 
-        Role adminRole = roleRepository.findByName("ADMIN");
-        user.addRole(adminRole);
+        Role userRole = roleRepository.findByName("USER");
+        user.addRole(userRole);
 
         userRepository.save(user);
         return Mapper.map(user, UserDTO.class);
@@ -152,6 +148,19 @@ public class UserServiceImpl implements UserService {
         List<Long> excludeList = authenticationFacade.getCurrentUser().getFollowings().stream().map(user -> user.getId()).collect(Collectors.toList());
         excludeList.add(authenticationFacade.getCurrentUser().getId());
         Page<User> users = userRepository.findByIdNotIn(excludeList, pageable);
+        return Mapper.mapPage(users, UserDTO.class);
+    }
+
+    public void claimUser(Long id, Boolean status) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        user.setClaim(status);
+        userRepository.save(user);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE','PRI_EDIT')")
+    public Page<UserDTO> getListClaimUser(Pageable pageable) {
+        Page<User> users = userRepository.getByClaimIsTrue(pageable);
         return Mapper.mapPage(users, UserDTO.class);
     }
 }

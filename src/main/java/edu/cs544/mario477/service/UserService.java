@@ -26,4 +26,9 @@ public interface UserService {
     void updateAvatar(MultipartFile file);
 
     Page<UserDTO> getListSuggested(Pageable pageable);
+
+    void claimUser(Long id, Boolean status);
+
+    Page<UserDTO> getListClaimUser(Pageable pageable);
+
 }

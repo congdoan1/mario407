@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
@@ -104,6 +105,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_EDIT')")
     public PostDTO createPost(MultipartFile[] files, String text, Boolean notify) {
         try {
             Post post = new Post(text, authenticationFacade.getCurrentUser());
@@ -178,12 +180,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE','PRI_EDIT')")
     public List<PostDTO> findUnhealthyPost(Pageable pageable) {
         Sort sort = Sort.by("text").ascending();
-        Page<Post> posts = postRepository.findByHealthyIsFalse(pageable);
+        Page<Post> posts = postRepository.findByHealthyIsFalseAndReviewIsFalse(pageable);
         return posts.getContent().stream()
                 .map(post -> Mapper.map(post, PostDTO.class))
                 .collect(Collectors.toList());
     }
+
+
 }

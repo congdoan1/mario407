@@ -31,7 +31,6 @@ public class AdminController {
         Sort sort = Sort.by("postedDate").descending();
         Page<PostDTO> posts = adminService.findUnhealthyPost(PageUtil.initPage(page, size, sort));
         return ResponseBuilder.buildSuccess(posts);
-
     }
 
     @PostMapping("/posts/{id}")

@@ -117,11 +117,34 @@ public class UserController {
 
     }
 
-    @PostMapping("/users/{id}")
-    public Response setUserStatus(@PathVariable Long id,
-                                  @Param("active") Boolean active) {
+    @PostMapping("/{id}/active")
+    public Response setUserActive(@PathVariable Long id) {
 
-        adminService.setUserStatus(id, active);
+        adminService.setUserStatus(id, true);
         return ResponseBuilder.buildSuccess();
     }
+
+    @PostMapping("/{id}/deActive")
+    public Response setUserDeActive(@PathVariable Long id) {
+
+        adminService.setUserStatus(id, false);
+        return ResponseBuilder.buildSuccess();
+
+    }
+
+    @PostMapping("{id}/claim")
+    public Response claimUser(@PathVariable Long id) {
+        userService.claimUser(id, true);
+        return ResponseBuilder.buildSuccess();
+    }
+
+
+    @GetMapping("/claims")
+    public Response claimUsers(@RequestParam(value = "page", required = false) Integer page,
+                               @RequestParam(value = "size", required = false) Integer size) {
+        Page<UserDTO> users = userService.getListClaimUser(PageUtil.initPage(page, size));
+        return ResponseBuilder.buildSuccess(users);
+
+    }
+
 }
