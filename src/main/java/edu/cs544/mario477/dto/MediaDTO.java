@@ -11,4 +11,7 @@ public class MediaDTO {
     private String url;
 
     private String fileFormat;
+
+    @JsonProperty("type")
+    private String decriminatorValue;
 }

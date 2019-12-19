@@ -100,7 +100,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO createPost(MultipartFile[] files, String text) {
+    public PostDTO createPost(MultipartFile[] files, String text, Boolean notify) {
         try {
             Post post = new Post(text, authenticationFacade.getCurrentUser());
             post.setEnabled(true);
@@ -115,7 +115,7 @@ public class PostServiceImpl implements PostService {
             postRepository.save(post);
 
             //Send new post message to RabbitMQ
-            notification.notifyNewPost(post);
+//            notification.notifyNewPost(post);
 
 //            if (postRepository.checkHealthyPost(post.getText()) > 0) {
 //                notification.notifyUnHealthyPost(post);

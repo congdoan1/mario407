@@ -4,12 +4,9 @@ import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.enumerable.NotificationExchange;
 import edu.cs544.mario477.enumerable.NotificationRoute;
-import edu.cs544.mario477.notification.Notification;
-import edu.cs544.mario477.repository.UserRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.security.krb5.internal.tools.Klist;
 
 import java.util.List;
 import java.util.stream.Collectors;

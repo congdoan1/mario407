@@ -15,7 +15,7 @@ public interface PostService {
 
     Page<PostDTO> getTimelineByUsername(String username, Pageable pageable);
 
-    PostDTO createPost(MultipartFile[] files, String text);
+    PostDTO createPost(MultipartFile[] files, String text, Boolean notify);
 
     Page<PostDTO> searchPost(String q, Pageable pageable);
 

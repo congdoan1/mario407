@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("posts")
+@RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
@@ -46,16 +46,18 @@ public class PostController {
     public Response<PostDTO> create(@RequestParam("files") MultipartFile[] files,
                                     @RequestParam("text") String text) {
 
-        PostDTO postDTO = postService.createPost(files, text);
+        PostDTO postDTO = postService.createPost(files, text, false);
 
         return ResponseBuilder.buildSuccess(postDTO);
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<PostDTO> update(@RequestParam(value = "files", required = false) MultipartFile[] files,
-                                    @RequestParam("text") String text) {
+                                    @RequestParam("type") String type,
+                                    @RequestParam("text") String text,
+                                    @RequestParam("notify") Boolean notify) {
 
-        PostDTO postDTO = postService.createPost(files, text);
+        PostDTO postDTO = postService.createPost(files, text, notify);
 
         return ResponseBuilder.buildSuccess(postDTO);
     }
