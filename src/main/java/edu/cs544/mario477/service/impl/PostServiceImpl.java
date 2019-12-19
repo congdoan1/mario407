@@ -102,7 +102,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_EDIT')")
-    public PostDTO createPost(MultipartFile[] files, String text) {
+    public PostDTO createPost(MultipartFile[] files, String text, Boolean notify) {
         try {
             Post post = new Post(text, authenticationFacade.getCurrentUser());
             post.setEnabled(true);
@@ -177,10 +177,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE')")
+    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE','PRI_EDIT')")
     public List<PostDTO> findUnhealthyPost(Pageable pageable) {
         Sort sort = Sort.by("text").ascending();
-        Page<Post> posts = postRepository.findByHealthyIsFalse(pageable);
+        Page<Post> posts = postRepository.findByHealthyIsFalseAndReviewIsFalse(pageable);
         return posts.getContent().stream()
                 .map(post -> Mapper.map(post, PostDTO.class))
                 .collect(Collectors.toList());

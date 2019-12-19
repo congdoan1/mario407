@@ -43,7 +43,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE','PRI_EDIT')")
     public Page<PostDTO> findUnhealthyPost(Pageable pageable) {
-        Page<Post> posts = postRepository.findByHealthyIsFalse(pageable);
+        Page<Post> posts = postRepository.findByHealthyIsFalseAndReviewIsFalse(pageable);
         return Mapper.mapPage(posts, PostDTO.class);
 
     }
@@ -59,6 +59,7 @@ public class AdminServiceImpl implements AdminService {
     @PreAuthorize("hasAnyAuthority('PRI_EDIT')")
     public void setPostStatus(Long postId, boolean status) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
+        if(status) post.setReview(true);
         post.setEnabled(status);
         postRepository.save(post);
     }

@@ -125,4 +125,20 @@ public class UserController {
         return ResponseBuilder.buildSuccess();
 
     }
+
+    @PostMapping("{id}/claim")
+    public Response claimUser(@PathVariable Long id) {
+        userService.claimUser(id, true);
+        return ResponseBuilder.buildSuccess();
+    }
+
+
+    @GetMapping("/claims")
+    public Response claimUsers(@RequestParam(value = "page", required = false) Integer page,
+                               @RequestParam(value = "size", required = false) Integer size) {
+        Page<UserDTO> users = userService.getListClaimUser(PageUtil.initPage(page, size));
+        return ResponseBuilder.buildSuccess(users);
+
+    }
+
 }
