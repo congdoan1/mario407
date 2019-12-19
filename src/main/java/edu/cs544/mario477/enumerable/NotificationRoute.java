@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum NotificationRoute {
     NEW_POST("NEW.POST"),
-    UNHEALTHY_POST("UNHEALTHY.POST"),
+    CHECK_UNHEALTHY_POST("CHECK.UNHEALTHY.POST"),
     OTHER("OTHER");
 
     private String value;
