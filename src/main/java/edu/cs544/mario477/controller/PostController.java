@@ -64,7 +64,6 @@ public class PostController {
 
     @GetMapping
     public Response search(@RequestParam(value = "q", required = false) String q,
-                           @RequestParam(value = "isHealthy", required = false) Boolean isHealthy,
                            @RequestParam(value = "page", required = false) Integer page,
                            @RequestParam(value = "size", required = false) Integer size) {
 

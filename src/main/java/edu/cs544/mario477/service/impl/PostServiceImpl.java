@@ -1,6 +1,5 @@
 package edu.cs544.mario477.service.impl;
 
-import com.cloudinary.Cloudinary;
 import edu.cs544.mario477.domain.Comment;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
@@ -48,8 +47,6 @@ public class PostServiceImpl implements PostService {
 
     private final CommentRepository commentRepository;
 
-    private final Cloudinary cloudinary;
-
     private final IAuthenticationFacade authenticationFacade;
 
     private final EmailUtil emailUtil;
@@ -64,7 +61,6 @@ public class PostServiceImpl implements PostService {
                            StorageService storageService,
                            UserRepository userRepository,
                            CommentRepository commentRepository,
-                           Cloudinary cloudinary,
                            IAuthenticationFacade authenticationFacade,
                            EmailUtil emailUtil,
                            Notification notification) {
@@ -72,7 +68,6 @@ public class PostServiceImpl implements PostService {
         this.storageService = storageService;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
-        this.cloudinary = cloudinary;
         this.authenticationFacade = authenticationFacade;
         this.emailUtil = emailUtil;
         this.notification = notification;
@@ -82,7 +77,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostDTO> getHomePosts(User currentUser, Pageable pageable) {
         List<User> users = new ArrayList<>(currentUser.getFollowings());
         users.add(currentUser);
-        Page<Post> posts = postRepository.findByOwnerIn(users, pageable);
+        Page<Post> posts = postRepository.findByOwnerInAndAndEnabledIsTrue(users, pageable);
         for (Post p : posts.getContent()) {
             p.setLiked(p.getLikers().contains(currentUser));
         }
@@ -100,7 +95,7 @@ public class PostServiceImpl implements PostService {
         } else {
             queryUser = authenticationFacade.getCurrentUser();
         }
-        Page<Post> posts = postRepository.findByOwner(queryUser, pageable);
+        Page<Post> posts = postRepository.findByOwnerAndEnabledIsTrue(queryUser, pageable);
         return Mapper.mapPage(posts, PostDTO.class);
     }
 
@@ -144,7 +139,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostDTO> searchPost(String q, Pageable pageable) {
-        return Mapper.mapPage(postRepository.findAll(pageable), PostDTO.class);
+        User user = authenticationFacade.getCurrentUser();
+        List<User> users = user.getFollowings();
+        users.add(user);
+        return Mapper.mapPage(postRepository.findByTextContainingAndOwnerIn(q, users, pageable), PostDTO.class);
     }
 
     @Override
