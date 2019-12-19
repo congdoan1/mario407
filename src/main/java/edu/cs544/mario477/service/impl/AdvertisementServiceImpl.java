@@ -12,6 +12,7 @@ import edu.cs544.mario477.service.AdvertisementService;
 import edu.cs544.mario477.util.Mapper;
 import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -72,8 +73,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         int age = LocalDate.now().getYear() - birthDay.getYear();
         Address address = user.getAddress();
 
-        List<Advertisement> list = advertisementRepository.findByAgeBeforeAndCountryOrStateOrCity
-                (age, address.getCountry(), address.getState(), address.getCity());
+        List<Advertisement> list = advertisementRepository.findByAllUserIsTrue();
+        //advertisementRepository.findByAgeBeforeAndCountryOrStateOrCity
+                //(age, address.getCountry(), address.getState(), address.getCity());
 
         if (list.size() <= 0)
             list = advertisementRepository.findByAgeAfter(age);
@@ -96,22 +98,17 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public List<AdvertisementDTO> findAll(int page) {
+    public Page<AdvertisementDTO> findAll(Pageable pageable) {
 
-        Sort sort = Sort.by("title").ascending();
-        Pageable pageable = PageUtil.initPage(page, Constants.DEFAULT_SIZE, sort);
-
-        List<Advertisement> list = advertisementRepository.findAllAd(pageable);
-        return Mapper.mapList(list, AdvertisementDTO.class);
+        Page<Advertisement> list = advertisementRepository.findAll(pageable);
+        return Mapper.mapPage(list, AdvertisementDTO.class);
     }
 
     @Override
     public void setStatusAdvertisement(Long id, boolean status) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Advertisement", "id", id));
-
-        if (advertisement != null) {
-            advertisement.setEnabled(status);
-        }
+        advertisement.setEnabled(status);
+        advertisementRepository.save(advertisement);
     }
 
 

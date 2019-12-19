@@ -1,6 +1,8 @@
 package edu.cs544.mario477.service;
 
 import edu.cs544.mario477.dto.AdvertisementDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ public interface AdvertisementService {
 
     AdvertisementDTO findAdvertisementByName(String name);
 
-    List<AdvertisementDTO> findAll(int page);
+    Page<AdvertisementDTO> findAll(Pageable pageable);
 
     void setStatusAdvertisement(Long id, boolean status);
 

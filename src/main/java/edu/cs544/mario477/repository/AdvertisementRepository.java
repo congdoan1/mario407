@@ -29,6 +29,6 @@ public interface AdvertisementRepository extends BaseRepository<Advertisement, L
     List<Advertisement> findByAgeBeforeAndCountryOrStateOrCity
             (int age, String country, String state, String city);
 
-
+    List<Advertisement> findByAllUserIsTrue();
 }
 
