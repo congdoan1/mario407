@@ -96,4 +96,11 @@ public class UserController {
         userService.updateAvatar(avatarFile);
         return ResponseBuilder.buildSuccess();
     }
+
+    @GetMapping("/suggested")
+    public Response getSuggestedUser(@RequestParam(value = "page", required = false) Integer page,
+                                     @RequestParam(value = "size", required = false) Integer size) {
+        Page<UserDTO> users = userService.getListSuggested(PageUtil.initPage(page, size));
+        return ResponseBuilder.buildSuccess(users);
+    }
 }

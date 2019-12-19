@@ -142,7 +142,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostDTO> searchPost(String q, Pageable pageable) {
-        return null;
+        return Mapper.mapPage(postRepository.findAll(pageable), PostDTO.class);
     }
 
     @Override

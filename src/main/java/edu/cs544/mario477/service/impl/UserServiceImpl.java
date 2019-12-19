@@ -23,6 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -134,5 +137,13 @@ public class UserServiceImpl implements UserService {
         User user = authenticationFacade.getCurrentUser();
         user.setAvatarUrl(storageService.upload(file, user.getId()));
         userRepository.save(user);
+    }
+
+    @Override
+    public Page<UserDTO> getListSuggested(Pageable pageable) {
+        List<Long> excludeList = authenticationFacade.getCurrentUser().getFollowings().stream().map(user -> user.getId()).collect(Collectors.toList());
+        excludeList.add(authenticationFacade.getCurrentUser().getId());
+        Page<User> users = userRepository.findByIdNotIn(excludeList, pageable);
+        return Mapper.mapPage(users, UserDTO.class);
     }
 }
