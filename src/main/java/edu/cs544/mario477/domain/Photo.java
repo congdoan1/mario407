@@ -14,7 +14,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue(value = "IMAGE")
 public class Photo extends Media {
 
-    public Photo(String id, String url, String fileFormat, String type) {
-        super(url, fileFormat, type);
+    public Photo(String id, String url, String fileFormat) {
+        super(url, fileFormat);
     }
 }

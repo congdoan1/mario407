@@ -5,12 +5,11 @@ import edu.cs544.mario477.domain.Comment;
 import edu.cs544.mario477.domain.Post;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.CommentDTO;
-import edu.cs544.mario477.dto.MailDTO;
 import edu.cs544.mario477.dto.PostDTO;
 import edu.cs544.mario477.exception.AppException;
 import edu.cs544.mario477.exception.ResourceNotFoundException;
-import edu.cs544.mario477.repository.CommentRepository;
 import edu.cs544.mario477.notification.Notification;
+import edu.cs544.mario477.repository.CommentRepository;
 import edu.cs544.mario477.repository.PostRepository;
 import edu.cs544.mario477.repository.UserRepository;
 import edu.cs544.mario477.service.IAuthenticationFacade;
@@ -18,13 +17,13 @@ import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.StorageService;
 import edu.cs544.mario477.util.EmailUtil;
 import edu.cs544.mario477.util.Mapper;
-import edu.cs544.mario477.util.PageUtil;
-import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -104,10 +104,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO createPost(MultipartFile[] files, String text) {
+    public PostDTO createPost(MultipartFile[] files, String text, Boolean notify) {
         try {
             Post post = new Post(text, authenticationFacade.getCurrentUser());
             post.setEnabled(true);
+            post.setHealthy(true);
             post.setPostedDate(LocalDateTime.now());
             post.setLastModifiedDate(LocalDateTime.now());
             postRepository.saveAndFlush(post);
@@ -118,21 +119,21 @@ public class PostServiceImpl implements PostService {
             postRepository.save(post);
 
             //Send new post message to RabbitMQ
-            notification.notifyNewPost(post);
+//            notification.notifyNewPost(post);
 
-            if (postRepository.checkHealthyPost(post.getText()) > 0) {
-                notification.notifyUnHealthyPost(post);
-            }
+//            if (postRepository.checkHealthyPost(post.getText()) > 0) {
+//                notification.notifyUnHealthyPost(post);
+//            }
 
             //Check malicious user's unhealthy post;
-            if (postRepository.countUnhealthyPost(post.getOwner().getId()) >= 20) {
-                userRepository.updateUserStatus(post.getOwner().getId(), false);
-                MailDTO mailDTO = new MailDTO();
-                mailDTO.setFrom("");
-                mailDTO.setSubject("Lock account");
-                mailDTO.setText("Your account was locked by unhealthy posts. Contact admin for more information");
-                emailUtil.sendMail(mailDTO);
-            }
+//            if (postRepository.countUnhealthyPost(post.getOwner().getId()) >= 20) {
+//                userRepository.updateUserStatus(post.getOwner().getId(), false);
+//                MailDTO mailDTO = new MailDTO();
+//                mailDTO.setFrom("");
+//                mailDTO.setSubject("Lock account");
+//                mailDTO.setText("Your account was locked by unhealthy posts. Contact admin for more information");
+//                emailUtil.sendMail(mailDTO);
+//            }
 
             return Mapper.map(post, PostDTO.class);
         } catch (IOException e) {
@@ -175,5 +176,15 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException(Post.class, "id", postId));
         return Mapper.map(post, PostDTO.class);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<PostDTO> findUnhealthyPost(Pageable pageable) {
+        Sort sort = Sort.by("text").ascending();
+        Page<Post> posts = postRepository.findByHealthyIsFalse(pageable);
+        return posts.getContent().stream()
+                .map(post -> Mapper.map(post, PostDTO.class))
+                .collect(Collectors.toList());
     }
 }

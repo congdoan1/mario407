@@ -16,8 +16,8 @@ public class Video extends Media {
 
     private double duration;
 
-    public Video(String id, String url, String fileFormat, String type, double duration) {
-        super(url, fileFormat, type);
+    public Video(String id, String url, String fileFormat, double duration) {
+        super(url, fileFormat);
         this.duration = duration;
     }
 }

@@ -4,6 +4,7 @@ import edu.cs544.mario477.common.Response;
 import edu.cs544.mario477.common.ResponseBuilder;
 import edu.cs544.mario477.domain.User;
 import edu.cs544.mario477.dto.UserDTO;
+import edu.cs544.mario477.service.AdminService;
 import edu.cs544.mario477.service.IAuthenticationFacade;
 import edu.cs544.mario477.service.PostService;
 import edu.cs544.mario477.service.UserService;
@@ -12,6 +13,7 @@ import edu.cs544.mario477.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,19 +26,20 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 public class UserController {
 
-    private UserService userService;
-
-    private PostService postService;
-
     private final IAuthenticationFacade authenticationFacade;
+    private UserService userService;
+    private PostService postService;
+    private AdminService adminService;
 
     @Autowired
     public UserController(UserService userService,
                           PostService postService,
-                          IAuthenticationFacade authenticationFacade) {
+                          IAuthenticationFacade authenticationFacade,
+                          AdminService adminService) {
         this.userService = userService;
         this.postService = postService;
         this.authenticationFacade = authenticationFacade;
+        this.adminService = adminService;
     }
 
     @PostMapping("/{username}/follow")
@@ -86,7 +89,7 @@ public class UserController {
 
     @PutMapping("/{username}")
     public Response<Void> updateUser(@PathVariable String username,
-            @RequestBody @Valid UserDTO userDTO) {
+                                     @RequestBody @Valid UserDTO userDTO) {
         userService.updateUser(userDTO);
         return ResponseBuilder.buildSuccess();
     }
@@ -102,5 +105,23 @@ public class UserController {
                                      @RequestParam(value = "size", required = false) Integer size) {
         Page<UserDTO> users = userService.getListSuggested(PageUtil.initPage(page, size));
         return ResponseBuilder.buildSuccess(users);
+    }
+
+    @GetMapping("/users")
+    public Response maliciousUser(@RequestParam("malicious") Boolean malicious,
+                                  @RequestParam(value = "page", required = false) Integer page,
+                                  @RequestParam(value = "size", required = false) Integer size) {
+
+        Page<UserDTO> users = adminService.findMaliciousUser(PageUtil.initPage(page, size));
+        return ResponseBuilder.buildSuccess(users);
+
+    }
+
+    @PostMapping("/users/{id}")
+    public Response setUserStatus(@PathVariable Long id,
+                                  @Param("active") Boolean active) {
+
+        adminService.setUserStatus(id, active);
+        return ResponseBuilder.buildSuccess();
     }
 }

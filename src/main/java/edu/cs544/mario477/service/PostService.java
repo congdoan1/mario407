@@ -7,13 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface PostService {
 
     Page<PostDTO> getHomePosts(User currentUser, Pageable pageable);
 
     Page<PostDTO> getTimelineByUsername(String username, Pageable pageable);
 
-    PostDTO createPost(MultipartFile[] files, String text);
+    PostDTO createPost(MultipartFile[] files, String text, Boolean notify);
 
     Page<PostDTO> searchPost(String q, Pageable pageable);
 
@@ -24,4 +26,6 @@ public interface PostService {
     Page<CommentDTO> getCommentByPost(long postId, Pageable pageable);
 
     PostDTO getPost(Long postId);
+
+    List<PostDTO> findUnhealthyPost(Pageable pageable);
 }

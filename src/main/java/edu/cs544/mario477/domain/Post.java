@@ -3,6 +3,7 @@ package edu.cs544.mario477.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,6 +21,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "post")
+@DynamicUpdate
 public class Post {
 
     @Id
@@ -41,7 +43,7 @@ public class Post {
     private boolean enabled;
 
     @Column(name = "is_healthy")
-    private boolean isHealthy;
+    private boolean healthy;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

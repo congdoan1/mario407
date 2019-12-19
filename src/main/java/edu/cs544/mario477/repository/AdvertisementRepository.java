@@ -2,7 +2,6 @@ package edu.cs544.mario477.repository;
 
 import edu.cs544.mario477.base.BaseRepository;
 import edu.cs544.mario477.domain.Advertisement;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 

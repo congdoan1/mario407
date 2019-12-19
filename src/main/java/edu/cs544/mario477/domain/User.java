@@ -3,6 +3,7 @@ package edu.cs544.mario477.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -19,6 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "[user]")
+@DynamicUpdate
 public class User {
 
     @Id
@@ -40,7 +42,7 @@ public class User {
     @Column(name = "email", length = 50, unique = true)
     private String email;
 
-    @Column(name = "phone", length = 10, unique = true)
+    @Column(name = "phone", length = 12, unique = true)
     private String phone;
 
     @Column(name = "birthday")
