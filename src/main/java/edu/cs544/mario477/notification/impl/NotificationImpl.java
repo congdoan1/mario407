@@ -19,12 +19,9 @@ public class NotificationImpl implements edu.cs544.mario477.notification.Notific
 
     private RabbitTemplate rabbitTemplate;
 
-    private UserRepository userRepository;
-
     @Autowired
-    public NotificationImpl(RabbitTemplate rabbitTemplate, UserRepository userRepository) {
+    public NotificationImpl(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -35,13 +32,15 @@ public class NotificationImpl implements edu.cs544.mario477.notification.Notific
                 NotificationRoute.NEW_POST.getValue(),
                 followers);
 
+        rabbitTemplate.convertAndSend(
+                NotificationExchange.POST.getValue(),
+                NotificationRoute.CHECK_UNHEALTHY_POST.getValue(),
+                post.getId());
+
     }
 
     @Override
     public void notifyUnHealthyPost(Post post) {
-        rabbitTemplate.convertAndSend(
-                NotificationExchange.POST.getValue(),
-                NotificationRoute.NEW_POST.getValue(),
-                post.getId());
+
     }
 }

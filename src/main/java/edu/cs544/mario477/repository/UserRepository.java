@@ -19,7 +19,7 @@ public interface UserRepository extends BaseRepository<User, Long> {
 //            select count(p.text) from post p  where p.text in (select k.definition from Keyword k where k.enabled=true)) >20
     @Query("select distinct u from User u join u.posts p where " +
             "( select count (p) from p where p.text in (select k.definition from Keyword k where k.enabled=true)) >=20")
-    List<User> findMaliciousUser(Pageable pageable);
+    Page<User> findMaliciousUser(Pageable pageable);
 
     List<User> findUserByAddressIsContaining(Address address);
 
@@ -28,10 +28,6 @@ public interface UserRepository extends BaseRepository<User, Long> {
     Optional<User> findByUsernameOrEmail(String username, String email);
 
     Optional<User> findByUsername(String username);
-
-    @Modifying
-    @Query("UPDATE User u SET u.enabled =:status WHERE u.id=:id")
-    void updateUserStatus(@Param("id") Long id, boolean status);
 
     @Query("select u.followings from User u where u.username = :username")
     Page<User> getListFollowingByUser(@Param("username") String username, Pageable pageable);
