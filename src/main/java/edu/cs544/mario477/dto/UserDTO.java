@@ -1,8 +1,10 @@
 package edu.cs544.mario477.dto;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
@@ -25,7 +27,6 @@ public class UserDTO {
     @Email
     private String email;
 
-    @Max(12)
     private String phone;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -35,6 +36,7 @@ public class UserDTO {
 
     private boolean enabled;
 
+    @Valid
     private AddressDTO address;
 
     private boolean isFollowing;

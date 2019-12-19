@@ -26,7 +26,7 @@ public class EmailUtil {
 
     public void sendNotificationUnHealthyPostToAdmin(Post post) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("admin@mail.com");
+        message.setFrom("luis.thong.phan@mail.com");
         message.setTo(post.getOwner().getEmail());
         message.setSubject("Unhealthy Post");
         message.setText("User " + post.getOwner().getUsername() + " has unhealthy Post: " + post.getText());

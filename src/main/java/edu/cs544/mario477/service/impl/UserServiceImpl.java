@@ -129,6 +129,7 @@ public class UserServiceImpl implements UserService {
             user.setPhone(dto.getPhone());
             user.setBirthday(dto.getBirthday());
             user.addAddress(Mapper.map(dto.getAddress(), Address.class));
+            user.setClaim(true);
             userRepository.save(user);
         } else {
             throw new AppException("You do not have permission to update this user information");

@@ -45,7 +45,7 @@ public class CheckUnHealthyPostListener {
                 if (postRepository.countUnhealthyPost(user.getId()) >= 20) {
                     user.setEnabled(false);
                     userRepository.saveAndFlush(user);
-                    emailUtil.sendNotificationUnHealthyPostToUser(post);
+//                    emailUtil.sendNotificationUnHealthyPostToUser(post);
                 }
 
             }
