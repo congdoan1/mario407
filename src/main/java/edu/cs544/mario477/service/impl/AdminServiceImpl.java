@@ -41,27 +41,31 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE','PRI_EDIT')")
     public Page<PostDTO> findUnhealthyPost(Pageable pageable) {
-        Page<Post> posts = postRepository.findByHealthyIsFalse(pageable);
+        Page<Post> posts = postRepository.findByHealthyIsFalseAndReviewIsFalse(pageable);
         return Mapper.mapPage(posts, PostDTO.class);
 
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE','PRI_EDIT')")
     public Page<UserDTO> findMaliciousUser(Pageable pageable) {
         Page<User> users = userRepository.findMaliciousUser(pageable);
         return Mapper.mapPage(users, UserDTO.class);
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('PRI_EDIT')")
     public void setPostStatus(Long postId, boolean status) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
+        if(status) post.setReview(true);
         post.setEnabled(status);
         postRepository.save(post);
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('PRI_EDIT')")
     public void setUserStatus(Long userId, boolean status) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         user.setEnabled(status);

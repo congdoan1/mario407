@@ -45,6 +45,9 @@ public class Post {
     @Column(name = "is_healthy")
     private boolean healthy;
 
+    @Column(name = "is_review")
+    private boolean review;
+
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;

@@ -15,7 +15,7 @@ import java.util.List;
 public interface PostRepository extends BaseRepository<Post, Long> {
     Page<Post> findByOwnerIn(List<User> user, Pageable pageable);
 
-    Page<Post> findByHealthyIsFalse(Pageable pageable);
+    Page<Post> findByHealthyIsFalseAndReviewIsFalse(Pageable pageable);
 
     @Modifying
     @Query("UPDATE Post p SET p.enabled =:status WHERE p.id=:id")

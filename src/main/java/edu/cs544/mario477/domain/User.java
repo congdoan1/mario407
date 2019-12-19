@@ -57,6 +57,10 @@ public class User {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @Column(name = "claim")
+    private boolean claim;
+
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;

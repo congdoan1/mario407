@@ -28,15 +28,11 @@ import java.time.LocalDateTime;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-
-    private RoleRepository roleRepository;
-
-    private PasswordEncoder passwordEncoder;
-
     private final IAuthenticationFacade authenticationFacade;
-
     private final StorageService storageService;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
@@ -134,5 +130,19 @@ public class UserServiceImpl implements UserService {
         User user = authenticationFacade.getCurrentUser();
         user.setAvatarUrl(storageService.upload(file, user.getId()));
         userRepository.save(user);
+    }
+
+    @Override
+    public void claimUser(Long id, Boolean status) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        user.setClaim(status);
+        userRepository.save(user);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority('PRI_READ','PRI_WRITE','PRI_EDIT')")
+    public Page<UserDTO> getListClaimUser(Pageable pageable) {
+        Page<User> users = userRepository.getByClaimIsTrue(pageable);
+        return Mapper.mapPage(users, UserDTO.class);
     }
 }
