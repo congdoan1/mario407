@@ -29,8 +29,14 @@ public abstract class Media {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Media(String url, String fileFormat, String type) {
+    public Media(String url, String fileFormat) {
         this.url = url;
         this.fileFormat = fileFormat;
     }
+
+    @Transient
+    public String getDecriminatorValue() {
+        return this.getClass().getAnnotation(DiscriminatorValue.class).value();
+    }
+
 }

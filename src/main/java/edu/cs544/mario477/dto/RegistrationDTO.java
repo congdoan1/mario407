@@ -19,14 +19,12 @@ public class RegistrationDTO {
     private String password;
 
     @NotBlank
-    @JsonProperty("first_name")
     private String firstName;
 
     @NotBlank
-    @JsonProperty("last_name")
     private String lastName;
 
-    @Email(message = "Wrong email format")
+    @Email
     @NotBlank
     private String email;
 

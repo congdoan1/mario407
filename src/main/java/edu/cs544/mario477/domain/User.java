@@ -3,6 +3,9 @@ package edu.cs544.mario477.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,6 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "[user]")
+@DynamicUpdate
 public class User {
 
     @Id
@@ -38,11 +42,14 @@ public class User {
     @Column(name = "email", length = 50, unique = true)
     private String email;
 
-    @Column(name = "phone", length = 10, unique = true)
+    @Column(name = "phone", length = 12, unique = true)
     private String phone;
 
     @Column(name = "birthday")
     private LocalDate birthday;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Column(name = "signup_date")
     private LocalDateTime signupDate;
@@ -50,7 +57,11 @@ public class User {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @OneToOne
+    @Column(name = "claim")
+    private boolean claim;
+
+
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
 
@@ -61,6 +72,7 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "owner")
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<Post> posts = new HashSet<>();
 
     @OneToMany(mappedBy = "owner")
@@ -70,15 +82,31 @@ public class User {
     @JoinTable(name = "following",
             joinColumns = {@JoinColumn(name = "following_id")},
             inverseJoinColumns = {@JoinColumn(name = "follower_id")})
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private List<User> followers = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "following",
             joinColumns = {@JoinColumn(name = "follower_id")},
             inverseJoinColumns = {@JoinColumn(name = "following_id")})
+    @LazyCollection(LazyCollectionOption.EXTRA)
     private List<User> followings = new ArrayList<>();
 
     public void addRole(Role role) {
         roles.add(role);
+    }
+
+    public void addAddress(Address address) {
+        if (address != null) {
+            if (this.address == null) {
+                this.address = address;
+            } else {
+                this.address.setStreet(address.getStreet());
+                this.address.setCity(address.getCity());
+                this.address.setState(address.getState());
+                this.address.setZipcode(address.getZipcode());
+                this.address.setCountry(address.getCountry());
+            }
+        }
     }
 }
